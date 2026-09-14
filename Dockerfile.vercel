@@ -1,0 +1,38 @@
+FROM eclipse-temurin:17-jdk-jammy
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV ANDROID_HOME=/opt/android-sdk
+ENV PATH=/opt/gradle/bin:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/35.0.0:$PATH
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl unzip git ca-certificates libc6 libstdc++6 zlib1g libncurses6 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Android command-line tools 2026.1.2 / 15859902
+RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
+    curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip -o /tmp/cmd.zip && \
+    unzip -q /tmp/cmd.zip -d /tmp/cmd && \
+    mv /tmp/cmd/cmdline-tools ${ANDROID_SDK_ROOT}/cmdline-tools/latest && \
+    rm -rf /tmp/cmd /tmp/cmd.zip
+
+RUN yes | sdkmanager --licenses >/dev/null || true && \
+    sdkmanager "platform-tools" "platforms;android-36" "build-tools;35.0.0"
+
+# Gradle 8.13 is required by Android Gradle Plugin 8.11.x
+RUN mkdir -p /opt/gradle && \
+    curl -fsSL https://services.gradle.org/distributions/gradle-8.13-bin.zip -o /tmp/gradle.zip && \
+    unzip -q /tmp/gradle.zip -d /opt/gradle && \
+    ln -s /opt/gradle/gradle-8.13 /opt/gradle/current && \
+    mkdir -p /opt/gradle/bin && \
+    ln -s /opt/gradle/current/bin/gradle /opt/gradle/bin/gradle && \
+    rm /tmp/gradle.zip
+
+WORKDIR /app
+COPY package.json ./
+RUN npm install --omit=dev
+COPY server.js ./
+COPY public ./public
+
+EXPOSE 80
+CMD ["node","server.js"]
