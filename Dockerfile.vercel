@@ -1,38 +1,93 @@
 FROM eclipse-temurin:17-jdk-jammy
 
 ENV DEBIAN_FRONTEND=noninteractive
+
+# Android SDK
 ENV ANDROID_SDK_ROOT=/opt/android-sdk
 ENV ANDROID_HOME=/opt/android-sdk
+
+# Gradle + Android SDK PATH
 ENV PATH=/opt/gradle/bin:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/35.0.0:$PATH
 
+# =========================================================
+# SYSTEM DEPENDENCIES + NODE.JS 20 + NPM
+# =========================================================
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl unzip git ca-certificates libc6 libstdc++6 zlib1g libncurses6 \
+    curl \
+    unzip \
+    git \
+    ca-certificates \
+    libc6 \
+    libstdc++6 \
+    zlib1g \
+    libncurses6 \
     && rm -rf /var/lib/apt/lists/*
 
-# Android command-line tools 2026.1.2 / 15859902
+# Install Node.js 20 LTS and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends nodejs && \
+    npm --version && \
+    node --version && \
+    rm -rf /var/lib/apt/lists/*
+
+# =========================================================
+# ANDROID COMMAND LINE TOOLS
+# =========================================================
 RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
-    curl -fsSL https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip -o /tmp/cmd.zip && \
+    curl -fsSL \
+    https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip \
+    -o /tmp/cmd.zip && \
     unzip -q /tmp/cmd.zip -d /tmp/cmd && \
     mv /tmp/cmd/cmdline-tools ${ANDROID_SDK_ROOT}/cmdline-tools/latest && \
     rm -rf /tmp/cmd /tmp/cmd.zip
 
+# =========================================================
+# ANDROID SDK PACKAGES
+# =========================================================
 RUN yes | sdkmanager --licenses >/dev/null || true && \
-    sdkmanager "platform-tools" "platforms;android-36" "build-tools;35.0.0"
+    sdkmanager \
+    "platform-tools" \
+    "platforms;android-36" \
+    "build-tools;35.0.0"
 
-# Gradle 8.13 is required by Android Gradle Plugin 8.11.x
+# =========================================================
+# GRADLE 8.13
+# =========================================================
 RUN mkdir -p /opt/gradle && \
-    curl -fsSL https://services.gradle.org/distributions/gradle-8.13-bin.zip -o /tmp/gradle.zip && \
+    curl -fsSL \
+    https://services.gradle.org/distributions/gradle-8.13-bin.zip \
+    -o /tmp/gradle.zip && \
     unzip -q /tmp/gradle.zip -d /opt/gradle && \
     ln -s /opt/gradle/gradle-8.13 /opt/gradle/current && \
     mkdir -p /opt/gradle/bin && \
     ln -s /opt/gradle/current/bin/gradle /opt/gradle/bin/gradle && \
-    rm /tmp/gradle.zip
+    rm -f /tmp/gradle.zip
 
+# =========================================================
+# VERIFY BUILD ENVIRONMENT
+# =========================================================
+RUN echo "===== BUILD ENVIRONMENT =====" && \
+    java -version && \
+    node --version && \
+    npm --version && \
+    gradle --version && \
+    sdkmanager --version && \
+    echo "============================="
+
+# =========================================================
+# APPLICATION
+# =========================================================
 WORKDIR /app
+
 COPY package.json ./
+
+# Install production dependencies
 RUN npm install --omit=dev
+
 COPY server.js ./
 COPY public ./public
 
 EXPOSE 80
-CMD ["node","server.js"]
+
+CMD ["node", "server.js"]
