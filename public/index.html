@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#f7f8fb">
-<title>Web to APK Studio</title>
+<title>Web to APK Studio v1.2</title>
 <style>
 :root{--bg:#f5f6fa;--card:#fff;--ink:#171922;--muted:#747b89;--line:#e7e9ee;--soft:#f0f2f6;--accent:#171922;--ok:#16835b;--danger:#b43b48}
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#f8f9fb,#eef1f6);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}button,input{font:inherit}button{cursor:pointer}
 .layout{min-height:100vh;display:flex}.side{width:235px;background:rgba(255,255,255,.82);backdrop-filter:blur(18px);border-right:1px solid var(--line);padding:22px 15px;position:fixed;inset:0 auto 0 0;z-index:10}.brand{display:flex;gap:10px;align-items:center;padding:4px 8px 28px}.brandmark{width:38px;height:38px;border-radius:12px;background:#171922;color:#fff;display:grid;place-items:center;box-shadow:0 8px 20px #17192220}.brandmark svg{width:20px}.brand b{font-size:13px}.brand small{display:block;color:#9aa0ab;font-size:8px;letter-spacing:1.4px;margin-top:3px}.navlabel{font-size:8px;color:#a2a8b3;letter-spacing:1.5px;padding:0 10px 9px}.nav{display:grid;gap:4px}.nav button{border:0;background:transparent;color:#737a88;border-radius:11px;padding:11px 12px;text-align:left;font-size:11px;display:flex;align-items:center;gap:10px}.nav button.active,.nav button:hover{background:#171922;color:#fff}.nav svg{width:16px}.sidefoot{position:absolute;left:15px;right:15px;bottom:18px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;font-size:9px;color:#7d8490}.live{display:inline-block;width:6px;height:6px;border-radius:50%;background:#20a36e;margin-right:5px}
 .main{margin-left:235px;width:calc(100% - 235px);padding:28px;max-width:1500px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.title{font-size:25px;font-weight:800;letter-spacing:-.7px}.sub{font-size:10px;color:var(--muted);margin-top:5px}.topbtn{border:1px solid var(--line);background:#fff;border-radius:10px;width:38px;height:38px}
-.page{display:none}.page.active{display:block}.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(290px,.65fr);gap:16px}.card{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px #3138470a}.cardpad{padding:20px}.head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}.ctitle{font-size:13px;font-weight:800}.desc{font-size:9px;color:var(--muted);margin-top:5px;line-height:1.55}.pill{font-size:8px;padding:6px 8px;border-radius:7px;background:var(--soft);color:#6e7582}
+.page{display:none}.page.active{display:block}.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(290px,.65fr);gap:16px}.info-stack{display:grid;gap:12px}.info-list{display:grid;gap:10px}.info-item{display:flex;justify-content:space-between;gap:15px;padding:11px 0;border-bottom:1px solid #f0f1f4}.info-item:last-child{border-bottom:0}.info-item span{font-size:9px;color:var(--muted)}.info-item b{font-size:10px;text-align:right;max-width:68%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.server-state{display:flex;align-items:center;gap:10px;padding:13px;border:1px solid var(--line);background:#fbfcfe;border-radius:12px}.state-dot{width:9px;height:9px;border-radius:50%;background:#a8afb9;flex:none}.state-dot.ok{background:#20a36e;box-shadow:0 0 12px #20a36e55}.state-dot.bad{background:#b43b48}.server-state strong{display:block;font-size:10px}.server-state small{display:block;color:var(--muted);font-size:8px;margin-top:3px}.runtime-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.runtime-box{border:1px solid var(--line);background:#fbfcfe;border-radius:11px;padding:11px}.runtime-box span{display:block;font-size:8px;color:var(--muted)}.runtime-box b{display:block;font-size:10px;margin-top:5px;word-break:break-word}.site-url{font-family:ui-monospace,SFMono-Regular,monospace;font-size:9px!important}.status-check{font-size:8px;color:var(--muted);margin-top:9px}.status-check.ok{color:var(--ok)}.status-check.bad{color:var(--danger)}.preview-loading{height:100%;display:grid;place-items:center;text-align:center;color:#747b89;font-size:10px;padding:30px}.preview-loading strong{display:block;color:#171922;margin-bottom:5px;font-size:12px}.preview-loading i{display:block;width:20px;height:20px;border:2px solid #dfe2e8;border-top-color:#171922;border-radius:50%;margin:0 auto 12px;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.card{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px #3138470a}.cardpad{padding:20px}.head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}.ctitle{font-size:13px;font-weight:800}.desc{font-size:9px;color:var(--muted);margin-top:5px;line-height:1.55}.pill{font-size:8px;padding:6px 8px;border-radius:7px;background:var(--soft);color:#6e7582}
 .field{margin:14px 0}.label{font-size:9px;font-weight:800;color:#727987;margin-bottom:7px;display:block;letter-spacing:.4px}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}input{width:100%;height:43px;border:1px solid var(--line);border-radius:10px;background:#fbfcfe;padding:0 12px;color:#171922;outline:0;font-size:11px}input:focus{border-color:#9ea4af;box-shadow:0 0 0 3px #17192208}.actions{display:flex;gap:9px;margin-top:17px}.primary{flex:1;border:0;border-radius:11px;background:#171922;color:#fff;height:45px;font-size:11px;font-weight:800}.secondary{border:1px solid var(--line);background:#fff;border-radius:11px;height:45px;padding:0 14px;font-size:10px}
 .preview{height:520px;display:flex;flex-direction:column}.previewtop{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.previewbody{flex:1;padding:12px;background:#f0f2f6}.frame{width:100%;height:100%;border:1px solid #dfe2e8;border-radius:13px;background:#fff;overflow:hidden}.frame iframe{width:100%;height:100%;border:0;background:#fff}.empty{height:100%;display:grid;place-items:center;text-align:center;color:#969ca7;font-size:10px;padding:30px}.empty strong{display:block;color:#555c68;margin-bottom:5px;font-size:12px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat{padding:17px}.stat span{font-size:9px;color:var(--muted)}.stat b{display:block;font-size:22px;margin-top:6px}.stat em{font-style:normal;font-size:8px;color:var(--ok)}
@@ -19,6 +19,8 @@
 .modal{position:fixed;inset:0;background:#17192255;backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px;z-index:30}.modal.show{display:flex}.dialog{width:min(450px,100%);background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 30px 90px #17192235}.bar{height:5px;background:#eceef2;border-radius:99px;overflow:hidden;margin:14px 0}.bar i{display:block;width:0;height:100%;background:#171922;transition:.3s}.dstatus{font-size:9px;color:var(--muted)}.download{display:none}.download.show{display:block}.close{border:1px solid var(--line);background:#fff;border-radius:10px;height:40px;padding:0 14px;font-size:10px}
 @media(max-width:900px){.side{transform:translateX(-100%);transition:.25s}.side.open{transform:none}.main{margin:0;width:100%;padding:17px}.grid{grid-template-columns:1fr}.preview{height:470px}.mobile{display:block!important}.stats{grid-template-columns:1fr 1fr}.engine{grid-template-columns:1fr}.topbtn{display:grid;place-items:center}.row{grid-template-columns:1fr}}
 @media(min-width:901px){.mobile{display:none!important}}
+
+.versionrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}.upload{border:1px dashed #d8dbe2;background:#fbfcfe;border-radius:12px;padding:12px;display:flex;align-items:center;gap:12px}.iconpick{width:54px;height:54px;border-radius:14px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;overflow:hidden;flex:none}.iconpick img{width:100%;height:100%;object-fit:cover}.iconpick svg{width:22px;color:#9aa0ab}.uploadinfo{min-width:0;flex:1}.uploadinfo b{font-size:10px;display:block}.uploadinfo span{font-size:8px;color:var(--muted);display:block;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.upload input{display:none}.choose{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;font-size:9px;font-weight:700;cursor:pointer}.switchline{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);background:#fbfcfe;border-radius:10px;padding:10px 12px;min-height:43px}.switch{position:relative;width:38px;height:21px;flex:none}.switch input{display:none}.slider{position:absolute;inset:0;background:#dfe2e8;border-radius:99px;cursor:pointer;transition:.2s}.slider:before{content:"";position:absolute;width:17px;height:17px;left:2px;top:2px;background:#fff;border-radius:50%;box-shadow:0 1px 4px #0002;transition:.2s}.switch input:checked+.slider{background:#171922}.switch input:checked+.slider:before{transform:translateX(17px)}.previewtabs{display:flex;gap:5px}.previewtabs button{border:1px solid var(--line);background:#fff;color:#747b89;border-radius:8px;padding:6px 8px;font-size:8px;font-weight:800}.previewtabs button.active{background:#171922;color:#fff;border-color:#171922}.device{height:100%;display:grid;place-items:center;background:linear-gradient(135deg,#f1f3f7,#e7eaf0);padding:18px}.phone{width:min(290px,80%);height:90%;max-height:470px;background:#11131a;border:7px solid #11131a;border-radius:28px;box-shadow:0 18px 45px #1d223025;overflow:hidden;position:relative}.phonebar{height:24px;background:#171922;color:#fff;font-size:7px;display:flex;align-items:center;justify-content:space-between;padding:0 12px}.phone.fullscreen .phonebar{display:none}.phone iframe{width:100%;height:calc(100% - 24px);border:0;background:#fff}.phone.fullscreen iframe{height:100%}.previewmeta{font-size:8px;color:var(--muted);margin-top:7px;line-height:1.4}.badgeok{color:var(--ok);font-weight:800}.smallhint{font-size:8px;color:var(--muted);line-height:1.5;margin-top:7px}.buildver{font-family:ui-monospace,SFMono-Regular,monospace;font-size:8px;background:var(--soft);padding:4px 6px;border-radius:6px}@media(max-width:900px){.versionrow{grid-template-columns:1fr}.upload{flex-wrap:wrap}.phone{width:min(250px,82%)}}
 </style>
 </head>
 <body>
@@ -45,13 +47,36 @@
 <div class="card stat"><span>Engine</span><b style="font-size:15px;margin-top:10px">Android</b><em>WebView</em></div>
 </div>
 <div class="grid">
-<div class="card cardpad"><div class="head"><div><div class="ctitle">Quick Build</div><div class="desc">Masukkan URL dan langsung lihat preview aplikasi.</div></div><span class="pill">AUTO CONFIG</span></div>
-<div class="field"><label class="label">WEBSITE URL</label><input id="url" type="url" placeholder="https://example.com" oninput="preview()"></div>
-<div class="row"><div class="field"><label class="label">APP NAME</label><input id="name" value="My Website" oninput="preview()"></div><div class="field"><label class="label">PACKAGE</label><input id="pkg" value="com.webtoapk.app"></div></div>
-<div class="actions"><button class="primary" onclick="build()">BUILD APK</button><button class="secondary" onclick="document.getElementById('url').value='';preview()">Clear</button></div>
+<div class="card cardpad">
+<div class="head"><div><div class="ctitle">Website Overview</div><div class="desc">Informasi website yang sedang dipakai untuk proses WebView dan APK.</div></div><span class="pill" id="siteState">NO WEBSITE</span></div>
+<div class="info-list">
+<div class="info-item"><span>Website</span><b id="siteTitle">Belum ada website</b></div>
+<div class="info-item"><span>URL</span><b id="siteUrl" class="site-url">—</b></div>
+<div class="info-item"><span>Host</span><b id="siteHost">—</b></div>
+<div class="info-item"><span>Protocol</span><b id="siteProtocol">—</b></div>
+<div class="info-item"><span>HTTP Status</span><b id="siteHttp">—</b></div>
+<div class="info-item"><span>Content Type</span><b id="siteType">—</b></div>
 </div>
-<div class="card preview"><div class="previewtop"><div><div class="ctitle">Live Preview</div><div class="desc">Website asli dalam WebView preview</div></div><span class="pill" id="previewState">WAITING</span></div><div class="previewbody"><div class="frame" id="frame"><div class="empty"><div><strong>Belum ada website</strong>Masukkan URL HTTPS untuk memuat preview.</div></div></div></div></div>
+<div class="status-check" id="siteCheck">Masukkan URL di APK Builder untuk memuat informasi website.</div>
 </div>
+<div class="info-stack">
+<div class="card cardpad">
+<div class="head"><div><div class="ctitle">Server Status</div><div class="desc">Koneksi dashboard ke server build kamu.</div></div><span class="pill" id="serverBadge">CHECKING</span></div>
+<div class="server-state"><span class="state-dot" id="serverDot"></span><div><strong id="serverText">Memeriksa server...</strong><small id="serverDetail">Menghubungkan ke endpoint /health</small></div></div>
+<div class="status-check" id="vercelStatus">Menunggu status environment.</div>
+</div>
+<div class="card cardpad">
+<div class="head"><div><div class="ctitle">Runtime</div><div class="desc">Waktu aktif dan lingkungan server saat ini.</div></div><span class="pill">LIVE</span></div>
+<div class="runtime-grid">
+<div class="runtime-box"><span>UPTIME</span><b id="runtimeUptime">—</b></div>
+<div class="runtime-box"><span>NODE.JS</span><b id="runtimeNode">—</b></div>
+<div class="runtime-box"><span>PLATFORM</span><b id="runtimePlatform">—</b></div>
+<div class="runtime-box"><span>ARCH</span><b id="runtimeArch">—</b></div>
+</div>
+<div class="status-check" id="runtimeUpdated">Runtime belum diperbarui.</div>
+</div>
+</div>
+</div></div>
 </section>
 
 <section class="page" id="builder">
@@ -59,6 +84,38 @@
 <div class="card cardpad"><div class="head"><div><div class="ctitle">APK Builder</div><div class="desc">Konfigurasi sederhana. Versi Android dan build tool dipilih otomatis oleh engine.</div></div><span class="pill">AUTOMATIC</span></div>
 <div class="field"><label class="label">WEBSITE URL</label><input id="burl" type="url" placeholder="https://example.com" oninput="syncBuilder()"></div>
 <div class="row"><div class="field"><label class="label">APP NAME</label><input id="bname" value="My Website"></div><div class="field"><label class="label">PACKAGE NAME</label><input id="bpkg" value="com.webtoapk.app"></div></div>
+<div class="versionrow"><div class="field"><label class="label">APP VERSION</label><input id="bversion" value="1.1" placeholder="1.0" oninput="updatePreviewMode()"></div><div class="field"><label class="label">VERSION CODE</label><input id="bversionCode" value="Auto" readonly></div></div>
+<div class="field"><label class="label">APPLICATION ICON</label><div class="upload"><div class="iconpick" id="iconPreview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 15l2.5-3 2 2 1.5-2 2 3"/></svg></div><div class="uploadinfo"><b>PNG icon</b><span id="iconName">Belum memilih icon — maksimal 2 MB</span></div><label class="choose" for="iconFile">Pilih Icon</label><input id="iconFile" type="file" accept="image/png" onchange="handleIcon(event)"></div><div class="smallhint">Gunakan PNG persegi agar hasil icon aplikasi tetap rapi.</div></div>
+<div class="row"><div class="field"><label class="label">ANDROID</label><input value="Automatic • SDK 36" readonly></div><div class="field"><label class="label">ORIENTATION</label><input value="Portrait" readonly></div></div>
+<div class="field"><label class="label">FULL SCREEN</label><div class="switchline"><span style="font-size:9px"><b id="fullscreenText">OFF</b> — tampilkan status bar Android</span><label class="switch"><input id="bfullscreen" type="checkbox" onchange="updatePreviewMode()"><span class="slider"></span></label></div></div>
+<div class="actions"><button class="primary" onclick="buildFromBuilder()">BUILD APK 1.2</button></div></div>
+<div class="card preview"><div class="previewtop"><div><div class="ctitle">APK Preview</div><div class="desc">Simulasi tampilan WebView sebelum build.</div></div><div class="previewtabs"><button id="tabWeb" class="active" onclick="setPreviewTab('web')">WEBVIEW</button><button id="tabApk" onclick="setPreviewTab('apk')">APK</button></div></div><div class="previewbody"><div class="frame" id="bframe"><div class="empty"><div><strong>Preview</strong>Masukkan URL di sebelah kiri.</div></div></div></div><div style="padding:10px 16px;border-top:1px solid var(--line)"><span class="buildver" id="previewVersion">Version 1.2</span><span class="previewmeta"> APK preview di browser adalah simulasi; hasil final mengikuti konfigurasi APK saat build.</span></div></div>
+</div>
+</section>
+
+<section class="page" id="history">
+<div class="card cardpad"><div class="head"><div><div class="ctitle">Build History</div><div class="desc">Riwayat tersimpan di browser ini.</div></div><button class="secondary" onclick="clearHistory()">Clear history</button></div>
+<table class="history"><thead><tr><th>APP</th><th>URL</th><th>DATE</th><th>STATUS</th></tr></thead><tbody id="historyBody"></tbody></table></div>
+</section>
+
+<section class="page" id="engine">
+<div class="engine">
+<div class="card enginebox"><b>Android WebView</b><p>APK menggunakan WebView untuk membuka website yang kamu masukkan.</p></div>
+<div class="card enginebox"><b>Automatic SDK</b><p>Build image menyiapkan JDK, Android SDK dan Gradle secara otomatis.</p></div>
+<div class="card enginebox"><b>Vercel Container</b><p>Endpoint build dijalankan sebagai HTTP container function di Vercel.</p></div>
+<div class="card enginebox"><b>Direct APK</b><p>Server mengembalikan hasil APK sebagai file download setelah build selesai.</p></div>
+<div class="card enginebox"><b>Stateless</b><p>File build tidak disimpan permanen di container. History disimpan di browser.</p></div>
+<div class="card enginebox"><b>HTTPS</b><p>Website sebaiknya HTTPS agar dapat dimuat dengan aman oleh aplikasi.</p></div>
+</div>
+</section>
+</main></div>
+
+<div class="modal" id="modal"><div class="dialog"><div class="ctitle" style="font-size:16px">Building APK</div><div class="desc" id="mtext">Preparing Android project...</div><div class="bar"><i id="mbar"></i></div><div class="dstatus" id="mstatus">0%</div><div class="actions"><button class="close" onclick="closeModal()">Close</button><button class="primary download" id="download" onclick="downloadLast()">Download APK</button></div></div></div>
+
+<script>const $=id=>document.getElementById(id);
+let lastBlob=null,lastName='app.apk',iconData='';
+function toggleSide(){$('side').classList.toggle('open')}
+function page(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active');$('title').textContent=btn.textContent.trim();$('sub').textContent=id==='engine'?'Build environment and architecture':id==='dashboard'?'Website,iv></div>
 <div class="row"><div class="field"><label class="label">ANDROID</label><input value="Automatic" readonly></div><div class="field"><label class="label">ORIENTATION</label><input value="Portrait" readonly></div></div>
 <div class="actions"><button class="primary" onclick="buildFromBuilder()">BUILD APK</button></div></div>
 <div class="card preview"><div class="previewtop"><div><div class="ctitle">Live Preview</div><div class="desc">Same URL will be used by the APK.</div></div></div><div class="previewbody"><div class="frame" id="bframe"><div class="empty"><div><strong>Preview</strong>Masukkan URL di sebelah kiri.</div></div></div></div></div>
