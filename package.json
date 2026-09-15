@@ -1,8 +1,8 @@
 {
   "name": "web-to-apk-vercel",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
-  "description": "Web to APK builder using Android WebView and Vercel Container Functions",
+  "description": "Web to APK builder using Android WebView, URL/HTML sources, background jobs and Vercel Container Functions",
   "scripts": {
     "start": "node server.js"
   },
