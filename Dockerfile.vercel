@@ -9,9 +9,6 @@ ENV ANDROID_HOME=/opt/android-sdk
 # Gradle + Android SDK PATH
 ENV PATH=/opt/gradle/bin:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/35.0.0:$PATH
 
-# Keep Gradle cache in a writable runtime directory.
-ENV GRADLE_USER_HOME=/tmp/gradle-cache
-
 # =========================================================
 # SYSTEM DEPENDENCIES + NODE.JS 20 + NPM
 # =========================================================
@@ -26,8 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libncurses6 \
     && rm -rf /var/lib/apt/lists/*
 
-# Node 20 is sufficient for the server and is intentionally kept
-# aligned with the previously stable build environment.
+# Install Node.js 20 LTS and npm
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get update && \
     apt-get install -y --no-install-recommends nodejs && \
@@ -49,8 +45,6 @@ RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
 # =========================================================
 # ANDROID SDK PACKAGES
 # =========================================================
-# Keep the SDK set small and match the Android project generated
-# by server.js: compileSdk/targetSdk 36 + build-tools 35.0.0.
 RUN yes | sdkmanager --licenses >/dev/null || true && \
     sdkmanager \
     "platform-tools" \
