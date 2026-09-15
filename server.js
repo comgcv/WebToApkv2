@@ -10,6 +10,7 @@ const GRADLE = "/opt/gradle/bin/gradle";
 const SDK = process.env.ANDROID_SDK_ROOT || "/opt/android-sdk";
 const MAX_ICON = 2 * 1024 * 1024;
 const MAX_HTML = 3 * 1024 * 1024;
+const MAX_SPLASH_VIDEO = 12 * 1024 * 1024;
 
 fs.mkdirSync(ROOT, { recursive: true });
 
@@ -79,108 +80,83 @@ function writeIcon(cfg,dir){
   const iconPath=path.join(dir,"app/src/main/res/drawable/app_icon.png");
   write(iconPath,buf);
 }
+function writeSplashVideo(cfg,dir){
+  if(!cfg.splashVideo) return false;
+  const m=String(cfg.splashVideo).match(/^data:video\/mp4;base64,([A-Za-z0-9+/=]+)$/);
+  if(!m) throw new Error("Splash video must be an MP4 file");
+  const buf=Buffer.from(m[1],"base64");
+  if(!buf.length || buf.length>MAX_SPLASH_VIDEO) throw new Error("Splash video is invalid or too large (max 12 MB)");
+  write(path.join(dir,"app/src/main/res/raw/splash.mp4"),buf);
+  return true;
+}
 function project(cfg,dir){
-  const pkg=packageName(cfg.pkg), app=safe(cfg.name);
-  const isHtml=cfg.sourceType==="html";
-  const url=isHtml ? "" : cfg.url;
+  const pkg=packageName(cfg.pkg), app=safe(cfg.name), isHtml=cfg.sourceType==='html', url=isHtml?'':cfg.url;
   const vName=versionName(cfg.version), vCode=versionCode(vName), fullscreen=!!cfg.fullscreen;
-  write(path.join(dir,"settings.gradle"),`pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+  const permissions=cfg.permissions||{};
+  const splashMode=['none','icon','fade','name','video'].includes(cfg.splashMode)?cfg.splashMode:'none';
+  const hasSplash=splashMode!=='none' && (splashMode==='video'?!!cfg.splashVideo:true);
+  if(cfg.platform && cfg.platform!=='android') throw new Error('Only Android builds are supported currently');
+  write(path.join(dir,'settings.gradle'),`pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
 dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
 rootProject.name="${app}"
 include(":app")`);
-  write(path.join(dir,"build.gradle"),`plugins { id 'com.android.application' version '8.11.1' apply false }`);
-  write(path.join(dir,"gradle.properties"),"org.gradle.jvmargs=-Xmx1536m\nandroid.useAndroidX=true\n");
-  write(path.join(dir,"app/build.gradle"),`plugins { id 'com.android.application' }
+  write(path.join(dir,'build.gradle'),`plugins { id 'com.android.application' version '8.11.1' apply false }`);
+  write(path.join(dir,'gradle.properties'),'org.gradle.jvmargs=-Xmx1536m\nandroid.useAndroidX=true\n');
+  write(path.join(dir,'app/build.gradle'),`plugins { id 'com.android.application' }
 android { namespace '${pkg}'; compileSdk 36
  defaultConfig { applicationId '${pkg}'; minSdk 23; targetSdk 36; versionCode ${vCode}; versionName "${xml(vName)}" }
 }`);
-  const iconLine=cfg.icon ? 'android:icon="@drawable/app_icon"' : '';
-  write(path.join(dir,"app/src/main/AndroidManifest.xml"),`<?xml version="1.0" encoding="utf-8"?>
+  const iconLine=cfg.icon?'android:icon="@drawable/app_icon"':'';
+  const permLines=[];
+  if(permissions.camera)permLines.push('<uses-permission android:name="android.permission.CAMERA"/>');
+  if(permissions.microphone)permLines.push('<uses-permission android:name="android.permission.RECORD_AUDIO"/>');
+  if(permissions.location)permLines.push('<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>','<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>');
+  if(permissions.notifications)permLines.push('<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>');
+  // File uploads use WebView's chooser; broad storage permissions are intentionally not added.
+  const splashActivity=hasSplash?`<activity android:name=".SplashActivity" android:screenOrientation="portrait" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity>`:'';
+  const launcher=hasSplash?'':`<intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>`;
+  write(path.join(dir,'app/src/main/AndroidManifest.xml'),`<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+${permLines.join('\n')}
 <uses-permission android:name="android.permission.INTERNET"/>
 <application android:theme="@style/AppTheme" android:label="${xml(cfg.name)}" ${iconLine} android:usesCleartextTraffic="true" android:hardwareAccelerated="true">
-<activity android:name=".MainActivity" android:screenOrientation="portrait" android:exported="true">
-<intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
-</activity></application></manifest>`);
-  write(path.join(dir,"app/src/main/res/values/styles.xml"),`<resources>
-<style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
-<item name="android:fontFamily">sans</item>
-<item name="android:colorAccent">#171922</item>
-<item name="android:windowActionModeOverlay">true</item>
-<item name="android:windowNoTitle">true</item>
-<item name="android:navigationBarColor">#000000</item>
-<item name="android:statusBarColor">#ffffff</item>
-<item name="android:windowLightStatusBar">true</item>
-</style></resources>`);
-  if(isHtml) {
-    htmlFileFromConfig(cfg,dir);
-    const fontSrc=path.join(__dirname,"public/font/twin.ttf");
-    if(fs.existsSync(fontSrc)) write(path.join(dir,"app/src/main/assets/font/twin.ttf"),fs.readFileSync(fontSrc));
-    // Keep the historical .tff spelling available too, while normalizing HTML references to .ttf.
-    if(fs.existsSync(fontSrc)) write(path.join(dir,"app/src/main/assets/font/twin.tff"),fs.readFileSync(fontSrc));
+${splashActivity}
+<activity android:name=".MainActivity" android:screenOrientation="${fullscreen?'unspecified':'portrait'}" android:exported="true">${launcher}</activity>
+</application></manifest>`);
+  write(path.join(dir,'app/src/main/res/values/styles.xml'),`<resources><style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#171922</item><item name="android:windowNoTitle">true</item></style></resources>`);
+  if(isHtml){htmlFileFromConfig(cfg,dir);const fontSrc=path.join(__dirname,'public/font/twin.ttf');if(fs.existsSync(fontSrc)){write(path.join(dir,'app/src/main/assets/font/twin.ttf'),fs.readFileSync(fontSrc));write(path.join(dir,'app/src/main/assets/font/twin.tff'),fs.readFileSync(fontSrc));}}
+  if(cfg.icon)writeIcon(cfg,dir);
+  if(splashMode==='video')writeSplashVideo(cfg,dir);
+  if(hasSplash){
+    const splashJava=splashMode==='video'?`package ${pkg};
+import android.app.Activity;import android.os.Bundle;import android.content.Intent;import android.graphics.Color;import android.view.View;import android.widget.VideoView;import android.net.Uri;
+public class SplashActivity extends Activity{private VideoView video;@Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);video=new VideoView(this);video.setBackgroundColor(Color.BLACK);setContentView(video);video.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/raw/splash"));video.setOnCompletionListener(v->openMain());video.setOnErrorListener((v,w,e)->{openMain();return true;});video.start();}private void openMain(){startActivity(new Intent(this,MainActivity.class));finish();}}`:
+`package ${pkg};
+import android.app.Activity;import android.os.Bundle;import android.content.Intent;import android.graphics.Color;import android.view.Gravity;import android.view.animation.AlphaAnimation;import android.widget.LinearLayout;import android.widget.ImageView;import android.widget.TextView;
+public class SplashActivity extends Activity{private void openMain(){startActivity(new Intent(this,MainActivity.class));finish();}@Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);box.setGravity(Gravity.CENTER);box.setBackgroundColor(Color.BLACK);ImageView img=new ImageView(this);img.setImageResource(${cfg.icon?'R.drawable.app_icon':'android.R.drawable.sym_def_app_icon'});img.setScaleType(ImageView.ScaleType.CENTER_INSIDE);box.addView(img,new LinearLayout.LayoutParams(112,112));${splashMode==='name'?`TextView name=new TextView(this);name.setText("${java(cfg.name)}");name.setTextColor(Color.WHITE);name.setTextSize(17);name.setGravity(Gravity.CENTER);LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(-2,-2);np.topMargin=18;box.addView(name,np);`:''}setContentView(box);${splashMode==='icon'?`box.postDelayed(()->openMain(),900);`: `AlphaAnimation a=new AlphaAnimation(0f,1f);a.setDuration(450);a.setAnimationListener(new android.view.animation.Animation.AnimationListener(){public void onAnimationStart(android.view.animation.Animation x){}public void onAnimationRepeat(android.view.animation.Animation x){}public void onAnimationEnd(android.view.animation.Animation x){AlphaAnimation out=new AlphaAnimation(1f,0f);out.setDuration(450);out.setStartOffset(650);out.setAnimationListener(new android.view.animation.Animation.AnimationListener(){public void onAnimationStart(android.view.animation.Animation x){}public void onAnimationRepeat(android.view.animation.Animation x){}public void onAnimationEnd(android.view.animation.Animation x){openMain();}});box.startAnimation(out);}});box.startAnimation(a);`}}`;
+    write(path.join(dir,'app/src/main/java',...pkg.split('.'),'SplashActivity.java'),splashJava);
   }
-  const load= isHtml ? 'web.loadUrl("file:///android_asset/index.html");' : `web.loadUrl("${java(url)}");`;
-  const fsPart=fullscreen ? `
- private void applyFullscreen(){
-   final int flags =
-     android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
-     android.view.View.SYSTEM_UI_FLAG_FULLSCREEN |
-     android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-     android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-     android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-     android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
-   getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
-   getWindow().setNavigationBarColor(android.graphics.Color.TRANSPARENT);
-   getWindow().getDecorView().setSystemUiVisibility(flags);
- }
-` : `
- private void applyFullscreen(){ }
-`;
-  write(path.join(dir,"app/src/main/java",...pkg.split("."),"MainActivity.java"),`package ${pkg};
-import android.app.Activity;
-import android.os.Bundle;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.webkit.WebChromeClient;
-import android.view.View;
-public class MainActivity extends Activity{
- WebView web;
- @Override public void onCreate(Bundle b){
-   super.onCreate(b);
-   web=new WebView(this);
-   WebSettings s=web.getSettings();
-   s.setJavaScriptEnabled(true);
-   s.setDomStorageEnabled(true);
-   s.setDatabaseEnabled(true);
-   s.setLoadWithOverviewMode(true);
-   s.setUseWideViewPort(true);
-   s.setMediaPlaybackRequiresUserGesture(false);
-   s.setAllowFileAccess(true);
-   s.setAllowContentAccess(true);
-   s.setAllowFileAccessFromFileURLs(true);
-   s.setAllowUniversalAccessFromFileURLs(true);
-   web.setWebViewClient(new WebViewClient());
-   web.setWebChromeClient(new WebChromeClient());
-   ${load}
-   setContentView(web);
-   applyFullscreen();
- }
- @Override public void onWindowFocusChanged(boolean hasFocus){
-   super.onWindowFocusChanged(hasFocus);
-   if(hasFocus) applyFullscreen();
- }
- @Override public void onBackPressed(){
-   if(web!=null && web.canGoBack()) web.goBack();
-   else super.onBackPressed();
- }${fsPart}
-}
+  const load=isHtml?'web.loadUrl("file:///android_asset/index.html");':`web.loadUrl("${java(url)}");`;
+  const fsPart=fullscreen?`private void applyFullscreen(){final int flags=android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|android.view.View.SYSTEM_UI_FLAG_FULLSCREEN|android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE|android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;getWindow().getDecorView().setSystemUiVisibility(flags);}`:`private void applyFullscreen(){}`;
+  const reload=cfg.reloadMode||'none';
+  const touch=reload==='tap'?`private long lastTap=0;`:'private long lastTap=0;';
+  const touchBlock=reload==='tap'?`web.setOnTouchListener((v,e)->{if(e.getAction()==android.view.MotionEvent.ACTION_UP){long now=android.os.SystemClock.elapsedRealtime();if(now-lastTap<350){web.reload();lastTap=0;}else lastTap=now;}return false;});`:'';
+  const swipe=reload==='pull'?`androidx.swiperefreshlayout.widget.SwipeRefreshLayout`:'none';
+  // Pull-to-refresh uses a dependency-free WebView touch gesture detector to avoid changing the existing Gradle engine.
+  const pull=reload==='pull'?`private float downY;private boolean moved=false;`:'private float downY;private boolean moved=false;';
+  const pullBlock=reload==='pull'?`web.setOnTouchListener((v,e)->{if(e.getAction()==android.view.MotionEvent.ACTION_DOWN){downY=e.getY();moved=false;}else if(e.getAction()==android.view.MotionEvent.ACTION_MOVE&&e.getY()-downY>90){moved=true;}else if(e.getAction()==android.view.MotionEvent.ACTION_UP&&moved&&web.getScrollY()<=0){web.reload();}return false;});`:'';
+  const runtimePerms=[]; if(permissions.camera)runtimePerms.push('android.permission.CAMERA'); if(permissions.microphone)runtimePerms.push('android.permission.RECORD_AUDIO'); if(permissions.location)runtimePerms.push('android.permission.ACCESS_FINE_LOCATION'); if(permissions.notifications)runtimePerms.push('android.permission.POST_NOTIFICATIONS');
+  const permArray=runtimePerms.length?runtimePerms.map(x=>'\"'+x+'\"').join(',') : '';
+  const chrome=`new WebChromeClient(){@Override public void onPermissionRequest(final PermissionRequest r){runOnUiThread(()->{if(${permissions.camera||permissions.microphone})r.grant(r.getResources());else r.deny();});}@Override public void onGeolocationPermissionsShowPrompt(String o,GeolocationPermissions.Callback c){if(${permissions.location})c.invoke(o,true,false);else c.invoke(o,false,false);}}`;
+  write(path.join(dir,'app/src/main/java',...pkg.split('.'),'MainActivity.java'),`package ${pkg};
+import android.app.Activity;import android.os.Bundle;import android.webkit.*;import android.view.*;import android.graphics.Color;import android.content.pm.PackageManager;
+public class MainActivity extends Activity{WebView web;${touch}${pull}
+ @Override public void onCreate(Bundle b){super.onCreate(b);web=new WebView(this);WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setDatabaseEnabled(true);s.setLoadWithOverviewMode(true);s.setUseWideViewPort(true);s.setMediaPlaybackRequiresUserGesture(false);s.setAllowFileAccess(true);s.setAllowContentAccess(true);web.setWebViewClient(new WebViewClient());web.setWebChromeClient(${chrome});getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);${touchBlock}${pullBlock}setContentView(web);${load};requestSelectedPermissions();applyFullscreen();}
+ private void requestSelectedPermissions(){String[] p={${permArray}};if(android.os.Build.VERSION.SDK_INT<23||p.length==0)return;if(android.os.Build.VERSION.SDK_INT<33&&p.length>0){java.util.ArrayList<String> a=new java.util.ArrayList<>();for(String x:p)if(!x.equals("android.permission.POST_NOTIFICATIONS"))a.add(x);p=a.toArray(new String[0]);}if(p.length>0)requestPermissions(p,700);}
+ @Override public void onRequestPermissionsResult(int r,String[] p,int[] g){super.onRequestPermissionsResult(r,p,g);}
+ @Override public void onWindowFocusChanged(boolean h){super.onWindowFocusChanged(h);if(h)applyFullscreen();}@Override public void onBackPressed(){if(web!=null&&web.canGoBack())web.goBack();else super.onBackPressed();}${fsPart}}
 `);
-  write(path.join(dir,"gradle/wrapper/gradle-wrapper.properties"),`distributionUrl=https\\://services.gradle.org/distributions/gradle-8.13-bin.zip`);
-  write(path.join(dir,"gradlew"),`#!/bin/sh
-exec ${GRADLE} "$@"`);
-  fs.chmodSync(path.join(dir,"gradlew"),0o755);
-  writeIcon(cfg,dir);
+  write(path.join(dir,'gradle/wrapper/gradle-wrapper.properties'),'distributionUrl=https\\://services.gradle.org/distributions/gradle-8.13-bin.zip');write(path.join(dir,'gradlew'),`#!/bin/sh\nexec ${GRADLE} "$@"`);fs.chmodSync(path.join(dir,'gradlew'),0o755);
 }
 
 async function previewProxy(req,res){
@@ -217,6 +193,7 @@ async function parseBody(req){
 function validateConfig(cfg){
   if(!cfg) throw new Error("Missing build configuration");
   if(!cfg.name || String(cfg.name).length>50) throw new Error("Invalid app name");
+  if(!cfg.version || !/^\d{1,3}\.\d{1,3}(\.\d{1,3})?$/.test(String(cfg.version))) throw new Error("Invalid version (use e.g. 1.0 or 1.0.1)");
   if(!cfg.pkg || !/^[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+$/.test(cfg.pkg)) throw new Error("Invalid package name");
   if(cfg.sourceType==="html"){
     const size=Buffer.byteLength(String(cfg.html||""),"utf8");
@@ -225,6 +202,59 @@ function validateConfig(cfg){
     if(!/^https?:\/\//i.test(cfg.url||"")) throw new Error("URL must be http or https");
   }
   if(cfg.icon && String(cfg.icon).length>1400000) throw new Error("Icon payload too large");
+  if(cfg.splashVideo){
+    const m=String(cfg.splashVideo).match(/^data:video\/mp4;base64,([A-Za-z0-9+/=]+)$/);
+    if(!m) throw new Error("Splash video must be an MP4 file");
+    if(Buffer.from(m[1],"base64").length>MAX_SPLASH_VIDEO) throw new Error("Splash video too large (max 12 MB)");
+  }
+  if(cfg.platform && cfg.platform!=='android') throw new Error('Only Android builds are supported currently');
+  if(cfg.splashMode && !['none','icon','fade','name','video'].includes(cfg.splashMode)) throw new Error('Invalid splash mode');
+  if(cfg.splashMode==='video' && !cfg.splashVideo) throw new Error('Splash video is required for video mode');
+  if(cfg.reloadMode && !['none','pull','tap'].includes(cfg.reloadMode)) throw new Error('Invalid reload mode');
+  if(cfg.permissions && typeof cfg.permissions!=='object') throw new Error('Invalid permissions');
+}
+
+async function inspectSource(cfg){
+  const checks=[]; const warnings=[];
+  validateConfig(cfg);
+  checks.push('Nama aplikasi valid');
+  checks.push('Version valid');
+  checks.push('Package APK valid');
+  checks.push('Konfigurasi fullscreen valid');
+  if(cfg.sourceType==='html'){
+    const html=String(cfg.html||'');
+    if(!/<html(?:\s|>)/i.test(html)) throw new Error('File HTML tidak memiliki tag <html> yang valid');
+    if(!/<body(?:\s|>)/i.test(html)) warnings.push('Tag <body> tidak ditemukan; HTML masih dapat dibuild tetapi sebaiknya diperiksa.');
+    if(!/<head(?:\s|>)/i.test(html)) warnings.push('Tag <head> tidak ditemukan; resource relatif mungkin perlu diperbaiki.');
+    checks.push('File HTML terbaca dan ukuran berada dalam batas 3 MB');
+    checks.push('Struktur HTML dasar terdeteksi');
+  }else{
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),12000);
+    try{
+      const target=new URL(cfg.url);
+      const r=await fetch(target.href,{redirect:'follow',signal:controller.signal,headers:{'User-Agent':'Mozilla/5.0 (WebToAPK Structure Check)','Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}});
+      const type=r.headers.get('content-type')||'';
+      if(!r.ok) throw new Error(`Website merespons HTTP ${r.status}`);
+      if(type && !/text\/html|application\/xhtml\+xml/i.test(type)) warnings.push('URL dapat diakses, tetapi Content-Type bukan HTML. WebView tetap akan mencoba memuatnya.');
+      checks.push(`Website dapat diakses (HTTP ${r.status})`);
+      checks.push('URL menggunakan HTTP/HTTPS yang valid');
+    }catch(e){
+      if(e.name==='AbortError') throw new Error('Pemeriksaan website timeout setelah 12 detik');
+      throw new Error('Website tidak dapat diperiksa dari server: '+e.message);
+    }finally{clearTimeout(timer)}
+  }
+  return {ok:true,checks,warnings};
+}
+
+async function handleInspect(req,res){
+  try{
+    const cfg=await parseBody(req);
+    const out=await inspectSource(cfg);
+    return send(res,200,JSON.stringify(out),'application/json');
+  }catch(e){
+    return send(res,400,JSON.stringify({ok:false,errors:[e.message],warnings:[]}),'application/json');
+  }
 }
 
 async function build(cfg,onProgress=()=>{}){
@@ -268,7 +298,7 @@ async function handleBuild(req,res){
 
 const server=http.createServer(async(req,res)=>{
   const u=new URL(req.url,"http://localhost");
-  if(req.method==="GET" && u.pathname==="/health") return send(res,200,JSON.stringify({ok:true,engine:"android-webview",version:"1.2"}),"application/json");
+  if(req.method==="GET" && u.pathname==="/health") return send(res,200,JSON.stringify({ok:true,engine:"android-webview",version:"1.3.1"}),"application/json");
   if(req.method==="GET" && u.pathname==="/_preview") return previewProxy(req,res);
   if(req.method==="GET" && (u.pathname==="/font/twin.ttf" || u.pathname==="/font/twin.tff")){
     const f=path.join(__dirname,"public/font/twin.ttf");
@@ -282,7 +312,9 @@ const server=http.createServer(async(req,res)=>{
     const f=path.join(__dirname,"public/sw.js");
     return send(res,200,fs.readFileSync(f),"application/javascript; charset=utf-8",{"Service-Worker-Allowed":"/"});
   }
+  if(req.method==="POST" && u.pathname==="/api/inspect") return handleInspect(req,res);
   if(req.method==="POST" && u.pathname==="/api/build") return handleBuild(req,res);
   send(res,404,"Not found");
 });
-server.listen(PORT,"0.0.0.0",()=>console.log("Web to APK server v1.2 listening on "+PORT));
+if(require.main===module) server.listen(PORT,"0.0.0.0",()=>console.log("Web to APK server v1.3 listening on "+PORT));
+module.exports={project,validateConfig,normalizeHtml,writeIcon,writeSplashVideo,versionCode,versionName};
