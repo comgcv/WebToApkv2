@@ -6,6 +6,8 @@ const { spawn } = require('child_process');
 const { execFile } = require('child_process');
 const { promisify } = require('util');
 const execFileAsync = promisify(execFile);
+let waitUntil = null;
+try { ({ waitUntil } = require('@vercel/functions')); } catch {}
 
 const PORT = Number(process.env.PORT || 80);
 const ROOT = process.env.WTA_ROOT || '/tmp/webtoapk';
@@ -35,16 +37,35 @@ function versionName(v){ const x=String(v||'1.0').trim(); return /^\d+(?:\.\d+){
 function versionCode(v){ const m=String(v||'1.0').match(/^\s*(\d+)(?:\.(\d+))?(?:\.(\d+))?/); if(!m)return 1; return Math.min(2100000000, Number(m[1])*1000000 + Number(m[2]||0)*1000 + Number(m[3]||0) || 1); }
 function extMime(p){ const e=path.extname(p).toLowerCase(); return ({'.html':'text/html','.htm':'text/html','.css':'text/css','.js':'text/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.gif':'image/gif','.ico':'image/x-icon','.txt':'text/plain','.woff':'font/woff','.woff2':'font/woff2','.ttf':'font/ttf','.mp3':'audio/mpeg','.mp4':'video/mp4'}[e] || 'application/octet-stream'); }
 
-function run(cmd,args,cwd,timeout=300000,onData,signal){
+function run(cmd,args,cwd,timeout=240000,onData,signal){
   return new Promise((resolve,reject)=>{
-    const p=spawn(cmd,args,{cwd,env:{...process.env,ANDROID_SDK_ROOT:SDK,ANDROID_HOME:SDK,GRADLE_USER_HOME:'/tmp/gradle-home'}}); if(signal) signal.process=p;
+    const env={...process.env,
+      ANDROID_SDK_ROOT:SDK,
+      ANDROID_HOME:SDK,
+      GRADLE_USER_HOME:process.env.GRADLE_USER_HOME || '/opt/gradle-cache',
+      JAVA_TOOL_OPTIONS:process.env.JAVA_TOOL_OPTIONS || '-Xmx1536m -Dfile.encoding=UTF-8'
+    };
+    const p=spawn(cmd,args,{cwd,env,stdio:['ignore','pipe','pipe']});
+    if(signal) signal.process=p;
     let out='',err='',done=false;
-    const add=(type,d)=>{const text=String(d); if(type==='out')out+=text;else err+=text; if(onData)onData(text);};
-    p.stdout.on('data',d=>add('out',d)); p.stderr.on('data',d=>add('err',d));
     const finish=(fn,v)=>{if(done)return;done=true;clearTimeout(timer);fn(v)};
-    const timer=setTimeout(()=>{try{p.kill('SIGKILL')}catch{} finish(reject,new Error('Build timeout after 5 minutes.'))},timeout);
-    if(signal)signal.kill=()=>{try{p.kill('SIGTERM')}catch{}};
-    p.on('close',code=>code===0?finish(resolve,out):finish(reject,new Error((err||out).slice(-9000)||'Gradle build failed')));
+    const add=(type,d)=>{
+      const text=String(d); if(type==='out')out+=text;else err+=text;
+      if(onData) for(const line of text.split(/\r?\n/)) if(line.trim()) onData(line);
+    };
+    p.stdout.on('data',d=>add('out',d));
+    p.stderr.on('data',d=>add('err',d));
+    const timer=setTimeout(()=>{
+      try{p.kill('SIGTERM')}catch{}
+      setTimeout(()=>{try{p.kill('SIGKILL')}catch{}},2500);
+      finish(reject,new Error('Build timeout after 4 minutes.'));
+    },timeout);
+    if(signal) signal.kill=()=>{try{p.kill('SIGTERM')}catch{};setTimeout(()=>{try{p.kill('SIGKILL')}catch{}},2000)};
+    p.on('close',code=>{
+      if(code===0) return finish(resolve,out);
+      const detail=(err||out).replace(/\u001b\[[0-?]*[ -/]*[@-~]/g,'').trim();
+      finish(reject,new Error(detail.slice(-12000)||`Gradle exited with code ${code}`));
+    });
     p.on('error',e=>finish(reject,e));
   });
 }
@@ -73,7 +94,7 @@ function androidProject(cfg,dir,job){
   const permXml=[...perms].filter(x=>allowedPerms.has(x)).map(x=>`<uses-permission android:name="android.permission.${x}"/>`).join('\n');
   write(path.join(dir,'settings.gradle'),`pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }\ndependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }\nrootProject.name="${app}"\ninclude(":app")`);
   write(path.join(dir,'build.gradle'),`plugins { id 'com.android.application' version '8.11.1' apply false }`);
-  write(path.join(dir,'gradle.properties'),'org.gradle.jvmargs=-Xmx1536m\nandroid.useAndroidX=true\nandroid.nonTransitiveRClass=true\n');
+  write(path.join(dir,'gradle.properties'),'org.gradle.jvmargs=-Xmx1536m\nandroid.useAndroidX=true\nandroid.nonTransitiveRClass=true\norg.gradle.daemon=false\norg.gradle.parallel=false\n');
   write(path.join(dir,'app/build.gradle'),`plugins { id 'com.android.application' }\nandroid { namespace '${pkg}'; compileSdk 36\n defaultConfig { applicationId '${pkg}'; minSdk 23; targetSdk 36; versionCode ${vCode}; versionName "${xml(vName)}" }\n}`);
   const iconLine=cfg.icon?'android:icon="@drawable/app_icon" android:roundIcon="@drawable/app_icon"':'';
   write(path.join(dir,'app/src/main/AndroidManifest.xml'),`<?xml version="1.0" encoding="utf-8"?>\n<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n${permXml}\n<application android:theme="@style/AppTheme" android:label="${xml(cfg.name)}" ${iconLine} android:usesCleartextTraffic="true" android:allowBackup="false" android:supportsRtl="true">\n<activity android:name=".MainActivity" android:screenOrientation="${orientation}" android:exported="true">\n<intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>\n</activity></application></manifest>`);
@@ -90,11 +111,55 @@ function androidProject(cfg,dir,job){
     write(path.join(dir,'app/src/main/assets/index.html'),String(cfg.html||'<!doctype html><html><body><h1>WebToAPK</h1></body></html>'));
   }
   const target=source==='url'?java(cfg.url):'file:///android_asset/index.html';
-  const splash=cfg.splash?`\n  private void showSplash(){ android.widget.ImageView v=new android.widget.ImageView(this); v.setImageResource(${cfg.splash?'R.drawable.splash':'0'}); v.setScaleType(android.widget.ImageView.ScaleType.CENTER_CROP); v.setBackgroundColor(android.graphics.Color.WHITE); setContentView(v); v.postDelayed(()->loadWeb(),700); }\n`:'\n  private void showSplash(){ loadWeb(); }\n';
-  const full=fullscreen?`\n  private void enableFullscreen(){\n    if(android.os.Build.VERSION.SDK_INT >= 30){\n      getWindow().setDecorFitsSystemWindows(false);\n      android.view.WindowInsetsController c=getWindow().getInsetsController();\n      if(c!=null){ c.hide(android.view.WindowInsets.Type.statusBars() | android.view.WindowInsets.Type.navigationBars()); c.setSystemBarsBehavior(android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE); }\n    } else { getWindow().getDecorView().setSystemUiVisibility(5894); }\n  }\n`:'\n';
-  const splashCall=cfg.splash?'showSplash();':'loadWeb();';
-  const jsBridge=`web.getSettings().setJavaScriptEnabled(true); web.getSettings().setDomStorageEnabled(true); web.getSettings().setDatabaseEnabled(true); web.getSettings().setMediaPlaybackRequiresUserGesture(false); web.getSettings().setDefaultFontFamily("${font}"); web.setWebViewClient(new WebViewClient());`;
-  write(path.join(dir,'app/src/main/java',...pkg.split('.'),'MainActivity.java'),`package ${pkg};\nimport android.app.Activity;import android.os.Bundle;import android.webkit.WebSettings;import android.webkit.WebView;import android.webkit.WebViewClient;\npublic class MainActivity extends Activity{\n WebView web;\n @Override public void onCreate(Bundle b){super.onCreate(b);${fullscreen?'enableFullscreen();':''}${splashCall}}\n private void loadWeb(){ web=new WebView(this); WebSettings s=web.getSettings(); ${jsBridge} web.loadUrl("${target}"); setContentView(web); }\n @Override public void onBackPressed(){if(web!=null&&web.canGoBack())web.goBack();else super.onBackPressed();}${splash}${full}\n}`);
+  const splashCode=cfg.splash ? `
+ private void showSplash(){ android.widget.ImageView v=new android.widget.ImageView(this); v.setImageResource(R.drawable.splash); v.setScaleType(android.widget.ImageView.ScaleType.CENTER_INSIDE); v.setBackgroundColor(android.graphics.Color.WHITE); setContentView(v); v.postDelayed(this::loadWeb,650); }
+` : '';
+  const fullCode=fullscreen ? `
+ private void enableFullscreen(){
+   if(android.os.Build.VERSION.SDK_INT>=30){
+     getWindow().setDecorFitsSystemWindows(false);
+     android.view.WindowInsetsController c=getWindow().getInsetsController();
+     if(c!=null){ c.hide(android.view.WindowInsets.Type.statusBars() | android.view.WindowInsets.Type.navigationBars()); c.setSystemBarsBehavior(android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE); }
+   } else { getWindow().getDecorView().setSystemUiVisibility(5894); }
+ }
+` : '';
+  const firstLoad=cfg.splash ? 'showSplash();' : 'loadWeb();';
+  const javaCode=`package ${pkg};
+import android.app.Activity;
+import android.os.Bundle;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.graphics.Color;
+
+public class MainActivity extends Activity {
+  private WebView web;
+  @Override public void onCreate(Bundle b){
+    super.onCreate(b);
+    ${fullscreen?'enableFullscreen();':''}
+    ${firstLoad}
+  }
+  private void loadWeb(){
+    web=new WebView(this);
+    WebSettings s=web.getSettings();
+    s.setJavaScriptEnabled(true);
+    s.setDomStorageEnabled(true);
+    s.setDatabaseEnabled(true);
+    s.setLoadWithOverviewMode(true);
+    s.setUseWideViewPort(true);
+    s.setMediaPlaybackRequiresUserGesture(false);
+    s.setDefaultFontFamily("${font}");
+    web.setBackgroundColor(Color.TRANSPARENT);
+    web.setWebViewClient(new WebViewClient());
+    web.loadUrl("${target}");
+    setContentView(web);
+  }
+  @Override public void onBackPressed(){
+    if(web!=null && web.canGoBack()) web.goBack(); else super.onBackPressed();
+  }
+${fullCode}${splashCode}}
+`;
+  write(path.join(dir,'app/src/main/java',...pkg.split('.'),'MainActivity.java'),javaCode);
   write(path.join(dir,'gradle/wrapper/gradle-wrapper.properties'),'distributionUrl=https\\://services.gradle.org/distributions/gradle-8.13-bin.zip');
   write(path.join(dir,'gradlew'),`#!/bin/sh\nexec ${GRADLE} "$@"`); fs.chmodSync(path.join(dir,'gradlew'),0o755); writeIcon(cfg,dir);
   job.log('Android project generated');
@@ -124,7 +189,7 @@ function validate(cfg){
 
 function createQueueJob(cfg){
   const id=crypto.randomUUID();
-  const job={id,status:'queued',progress:0,message:'Waiting in build queue',createdAt:Date.now(),startedAt:null,finishedAt:null,cfg:sanitizeCfg(cfg),rawCfg:{...cfg},apk:null,aab:null,name:null,logs:[],process:null,cancelled:false};
+  const deferred={}; deferred.promise=new Promise(r=>deferred.resolve=r); const job={id,status:'queued',progress:0,message:'Waiting in build queue',createdAt:Date.now(),startedAt:null,finishedAt:null,cfg:sanitizeCfg(cfg),rawCfg:{...cfg},apk:null,aab:null,name:null,logs:[],process:null,cancelled:false,deferred};
   jobs.set(id,job);queue.push(job);pump();return job;
 }
 function sanitizeCfg(cfg){ const x={...cfg}; if(x.icon)x.icon=true; if(x.splash)x.splash=true; if(x.html)x.html=true; if(x.projectZip)x.projectZip=true; return x; }
@@ -138,20 +203,36 @@ async function runBuild(job){
   try{
     validate(job.cfg);job.log('Valid configuration');
     await maybePrepareProject(job.cfg,dir,job);if(job.cancelled)throw new Error('Build cancelled.');
-    job.progress=25;job.message='Running Gradle build';job.log('Gradle assembleDebug + bundleRelease started');
-    await run(GRADLE,['--no-daemon','--stacktrace','assembleDebug'],dir,300000,job.log,job);if(job.cancelled)throw new Error('Build cancelled.');
-    job.progress=70;job.message='Building AAB';job.log('Gradle bundleRelease started');
-    await run(GRADLE,['--no-daemon','--stacktrace','bundleRelease'],dir,300000,job.log,job);if(job.cancelled)throw new Error('Build cancelled.');
+    job.progress=20;job.message='Running Android build';job.log('Gradle assembleDebug started');
+    await run(GRADLE,['--no-daemon','--console=plain','--stacktrace','assembleDebug'],dir,240000,(line)=>{
+      job.log(line);
+      const t=line.toLowerCase();
+      if(/:app:compile.*java|compile.*kotlin/.test(t)) job.progress=Math.max(job.progress,45);
+      else if(/:app:merge|process.*resources|package.*debug/.test(t)) job.progress=Math.max(job.progress,65);
+      else if(/assembledebug/.test(t)) job.progress=Math.max(job.progress,80);
+    },job);
+    if(job.cancelled)throw new Error('Build cancelled.');
     const apk=path.join(dir,'app/build/outputs/apk/debug/app-debug.apk');
-    const aab=path.join(dir,'app/build/outputs/bundle/release/app-release.aab');
     if(!fs.existsSync(apk))throw new Error('APK was not produced.');
-    if(!fs.existsSync(aab))throw new Error('AAB was not produced.');
-    job.apk=apk;job.aab=aab;job.name=safe(job.cfg.name);job.progress=100;job.status='success';job.message='Build completed successfully';job.finishedAt=Date.now();job.log('SUCCESS: APK and AAB ready');
+    job.apk=apk;
+    job.progress=82;job.message='APK ready — preparing AAB';job.log('APK created successfully.');
+
+    // AAB is an additional artifact. A failure here must not destroy a valid APK build.
+    try{
+      await run(GRADLE,['--no-daemon','--console=plain','--stacktrace','bundleRelease'],dir,180000,(line)=>job.log(line),job);
+      const aab=path.join(dir,'app/build/outputs/bundle/release/app-release.aab');
+      if(fs.existsSync(aab)){ job.aab=aab; job.log('AAB created successfully.'); }
+      else job.log('AAB was not produced; APK remains available.');
+    }catch(e){
+      if(job.cancelled)throw new Error('Build cancelled.');
+      job.log('AAB step failed: '+e.message);
+    }
+    job.name=safe(job.cfg.name);job.progress=100;job.status='success';job.message=job.aab?'Build completed — APK + AAB ready':'Build completed — APK ready';job.finishedAt=Date.now();job.log(job.aab?'SUCCESS: APK and AAB ready':'SUCCESS: APK ready');
   }catch(e){
     job.finishedAt=Date.now();
     if(job.cancelled||/cancelled/i.test(e.message||'')){job.status='cancelled';job.message='Build cancelled';job.progress=100;job.log('CANCELLED');}
     else{job.status='failed';job.message=e.message||'Build failed';job.progress=100;job.log('FAILED: '+job.message);}
-  }finally{job.process=null;}
+  }finally{job.process=null; if(job.deferred&&job.deferred.resolve) job.deferred.resolve();}
 }
 async function maybePrepareProject(cfg,dir,job){
   if((cfg.sourceType||'url')==='zip'){
@@ -190,7 +271,7 @@ const server=http.createServer(async(req,res)=>{
   try{
     const u=new URL(req.url,'http://localhost');
     if(req.method==='GET'&&u.pathname==='/_preview')return previewProxy(req,res);
-    if(req.method==='POST'&&u.pathname==='/api/build'){const cfg=await readBody(req);validate(cfg);const job=createQueueJob(cfg);return json(res,202,{jobId:job.id,status:job.status});}
+    if(req.method==='POST'&&u.pathname==='/api/build'){const cfg=await readBody(req);validate(cfg);const job=createQueueJob(cfg); if(typeof waitUntil==='function') waitUntil(job.deferred.promise); return json(res,202,{jobId:job.id,status:job.status});}
     if(req.method==='GET'&&u.pathname==='/api/health')return json(res,200,{ok:true,engine:'WebToAPK Studio',active,queued:queue.length});
     if(req.method==='GET'&&u.pathname.startsWith('/api/jobs/')){const id=u.pathname.split('/').pop();const j=jobs.get(id);if(!j)return json(res,404,{error:'Job not found'});return json(res,200,publicJob(j));}
     if(req.method==='POST'&&u.pathname.startsWith('/api/jobs/')&&u.pathname.endsWith('/cancel')){const id=u.pathname.split('/')[3];const j=jobs.get(id);if(!j)return json(res,404,{error:'Job not found'});if(j.status==='success'||j.status==='failed'||j.status==='cancelled')return json(res,409,{error:'Job already finished.'});j.cancelled=true;if(j.status==='queued'){j.status='cancelled';j.message='Build cancelled before start';j.finishedAt=Date.now();const i=queue.indexOf(j);if(i>=0)queue.splice(i,1);}else if(j.process&&j.process.kill)j.process.kill();return json(res,200,{ok:true,status:j.status});}

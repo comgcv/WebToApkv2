@@ -8,6 +8,7 @@ ENV ANDROID_HOME=/opt/android-sdk
 
 # Gradle + Android SDK PATH
 ENV PATH=/opt/gradle/bin:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:/opt/android-sdk/build-tools/35.0.0:$PATH
+ENV GRADLE_USER_HOME=/opt/gradle-cache
 
 # =========================================================
 # SYSTEM DEPENDENCIES + NODE.JS 20 + NPM
@@ -23,8 +24,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libncurses6 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 20 LTS and npm
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+# Install Node.js 24 LTS and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get update && \
     apt-get install -y --no-install-recommends nodejs && \
     npm --version && \
@@ -49,7 +50,8 @@ RUN yes | sdkmanager --licenses >/dev/null || true && \
     sdkmanager \
     "platform-tools" \
     "platforms;android-36" \
-    "build-tools;35.0.0"
+    "build-tools;35.0.0" \
+    "build-tools;36.0.0"
 
 # =========================================================
 # GRADLE 8.13
@@ -63,6 +65,27 @@ RUN mkdir -p /opt/gradle && \
     mkdir -p /opt/gradle/bin && \
     ln -s /opt/gradle/current/bin/gradle /opt/gradle/bin/gradle && \
     rm -f /tmp/gradle.zip
+
+
+# =========================================================
+# WARM GRADLE / ANDROID PLUGIN CACHE
+# This avoids downloading the Android Gradle Plugin during every
+# user build and prevents the UI from appearing stuck at 20-25%.
+# =========================================================
+RUN mkdir -p /opt/gradle-cache /tmp/warmup/app/src/main/java/com/webtoapk/warmup && \
+    printf '%s\n' \
+    'pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }' \
+    'dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }' \
+    'rootProject.name="warmup"' \
+    'include(":app")' > /tmp/warmup/settings.gradle && \
+    printf '%s\n' "plugins { id 'com.android.application' version '8.11.1' apply false }" > /tmp/warmup/build.gradle && \
+    printf '%s\n' "plugins { id 'com.android.application' }" "android { namespace 'com.webtoapk.warmup'; compileSdk 36; defaultConfig { applicationId 'com.webtoapk.warmup'; minSdk 23; targetSdk 36; versionCode 1; versionName '1.0' } }" > /tmp/warmup/app/build.gradle && \
+    printf '%s\n' '<manifest xmlns:android="http://schemas.android.com/apk/res/android"><application android:theme="@style/AppTheme"><activity android:name=".MainActivity" android:exported="true"/></application></manifest>' > /tmp/warmup/app/src/main/AndroidManifest.xml && \
+    mkdir -p /tmp/warmup/app/src/main/res/values && \
+    printf '%s\n' '<resources><style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar"/></resources>' > /tmp/warmup/app/src/main/res/values/styles.xml && \
+    printf '%s\n' 'package com.webtoapk.warmup; public class MainActivity extends android.app.Activity {}' > /tmp/warmup/app/src/main/java/com/webtoapk/warmup/MainActivity.java && \
+    gradle --no-daemon --console=plain --stacktrace :app:assembleDebug && \
+    rm -rf /tmp/warmup
 
 # =========================================================
 # VERIFY BUILD ENVIRONMENT
