@@ -49,10 +49,12 @@ function extractGradleFailure(out, err){
   const text=[...new Set([...unique,...tail])].join("\n");
   return text.slice(-12000) || "Gradle failed without a readable error message";
 }
-function run(cmd,args,cwd,timeout=270000,onProgress=()=>{}){
+function run(cmd,args,cwd,timeout=270000,onProgress=()=>{},signal=null){
   return new Promise((resolve,reject)=>{
     const p=spawn(cmd,args,{cwd,env:{...process.env,ANDROID_SDK_ROOT:SDK,ANDROID_HOME:SDK,GRADLE_USER_HOME:"/tmp/gradle-home"}});
     let out="",err="",settled=false;
+    const abortHandler=()=>{if(settled)return;try{p.kill('SIGKILL')}catch{};};
+    if(signal) signal.addEventListener('abort',abortHandler,{once:true});
     const timer=setTimeout(()=>{
       if(settled)return;
       settled=true;p.kill("SIGKILL");
@@ -76,6 +78,7 @@ function run(cmd,args,cwd,timeout=270000,onProgress=()=>{}){
     p.on("close",code=>{
       if(settled)return;
       settled=true;clearTimeout(timer);
+      if(signal) signal.removeEventListener('abort',abortHandler);
       if(code===0) resolve(out);
       else reject(new Error(extractGradleFailure(out,err)));
     });
@@ -116,6 +119,7 @@ function writeSplashVideo(cfg,dir){
 function project(cfg,dir){
   const pkg=packageName(cfg.pkg), app=safe(cfg.name), isHtml=cfg.sourceType==='html', url=isHtml?'':cfg.url;
   const vName=versionName(cfg.version), vCode=versionCode(vName), fullscreen=!!cfg.fullscreen;
+  const orientation=['portrait','landscape','unspecified'].includes(cfg.orientation)?cfg.orientation:'portrait';
   const permissions=cfg.permissions||{};
   const splashMode=['none','icon','fade','name','video'].includes(cfg.splashMode)?cfg.splashMode:'none';
   const hasSplash=splashMode!=='none' && (splashMode==='video'?!!cfg.splashVideo:true);
@@ -146,7 +150,7 @@ ${permLines.join('\n')}
 <uses-permission android:name="android.permission.INTERNET"/>
 <application android:theme="@style/AppTheme" android:label="${xml(cfg.name)}" ${iconLine} android:usesCleartextTraffic="true" android:hardwareAccelerated="true">
 ${splashActivity}
-<activity android:name=".MainActivity" android:screenOrientation="${fullscreen?'unspecified':'portrait'}" android:exported="true">${launcher}</activity>
+<activity android:name=".MainActivity" android:screenOrientation="${fullscreen?'unspecified':orientation}" android:exported="true">${launcher}</activity>
 </application></manifest>`);
   write(path.join(dir,'app/src/main/res/values/styles.xml'),`<resources><style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#171922</item><item name="android:windowNoTitle">true</item></style></resources>`);
   if(isHtml){htmlFileFromConfig(cfg,dir);const fontSrc=path.join(__dirname,'public/font/twin.ttf');if(fs.existsSync(fontSrc)){write(path.join(dir,'app/src/main/assets/font/twin.ttf'),fs.readFileSync(fontSrc));write(path.join(dir,'app/src/main/assets/font/twin.tff'),fs.readFileSync(fontSrc));}}
@@ -154,11 +158,17 @@ ${splashActivity}
   if(splashMode==='video')writeSplashVideo(cfg,dir);
   if(hasSplash){
     const splashJava=splashMode==='video'?`package ${pkg};
-import android.app.Activity;import android.os.Bundle;import android.content.Intent;import android.graphics.Color;import android.view.View;import android.widget.VideoView;import android.net.Uri;
-public class SplashActivity extends Activity{private VideoView video;private void openMain(){startActivity(new Intent(this,MainActivity.class));finish();}@Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);video=new VideoView(this);video.setBackgroundColor(Color.BLACK);setContentView(video);video.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/raw/splash"));video.setOnCompletionListener(new android.media.MediaPlayer.OnCompletionListener(){public void onCompletion(android.media.MediaPlayer mp){openMain();}});video.setOnErrorListener(new android.media.MediaPlayer.OnErrorListener(){public boolean onError(android.media.MediaPlayer mp,int what,int extra){openMain();return true;}});video.start();}}`:
+import android.app.Activity;import android.os.Bundle;import android.content.Intent;import android.graphics.Color;import android.graphics.Matrix;import android.view.Surface;import android.view.TextureView;import android.media.MediaPlayer;import android.net.Uri;import android.view.ViewGroup;
+public class SplashActivity extends Activity{
+ private TextureView videoView;private MediaPlayer player;private boolean opened=false;
+ private void openMain(){if(opened)return;opened=true;if(player!=null){try{player.stop();}catch(Exception e){}try{player.release();}catch(Exception e){}player=null;}startActivity(new Intent(this,MainActivity.class));finish();}
+ private void fitVideo(int vw,int vh){if(videoView==null||vw<=0||vh<=0)return;int sw=videoView.getWidth(),sh=videoView.getHeight();if(sw<=0||sh<=0)return;float scale=Math.max((float)sw/vw,(float)sh/vh);float dx=(sw-vw*scale)/2f,dy=(sh-vh*scale)/2f;Matrix m=new Matrix();m.setScale(scale,scale);m.postTranslate(dx,dy);videoView.setTransform(m);}
+ @Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);videoView=new TextureView(this);videoView.setOpaque(true);videoView.setLayoutParams(new ViewGroup.LayoutParams(-1,-1));setContentView(videoView);videoView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener(){public void onSurfaceTextureAvailable(android.graphics.SurfaceTexture st,int w,int h){try{player=new MediaPlayer();player.setDataSource(SplashActivity.this,Uri.parse("android.resource://"+getPackageName()+"/raw/splash"));player.setSurface(new Surface(st));player.setLooping(false);player.setOnPreparedListener(new MediaPlayer.OnPreparedListener(){public void onPrepared(MediaPlayer mp){fitVideo(mp.getVideoWidth(),mp.getVideoHeight());mp.start();}});player.setOnCompletionListener(new MediaPlayer.OnCompletionListener(){public void onCompletion(MediaPlayer mp){openMain();}});player.setOnErrorListener(new MediaPlayer.OnErrorListener(){public boolean onError(MediaPlayer mp,int what,int extra){openMain();return true;}});player.prepareAsync();}catch(Exception e){openMain();}}public void onSurfaceTextureSizeChanged(android.graphics.SurfaceTexture st,int w,int h){if(player!=null)fitVideo(player.getVideoWidth(),player.getVideoHeight());}public boolean onSurfaceTextureDestroyed(android.graphics.SurfaceTexture st){if(player!=null){try{player.setSurface(null);}catch(Exception e){}}return true;}public void onSurfaceTextureUpdated(android.graphics.SurfaceTexture st){}});}
+ @Override protected void onDestroy(){if(player!=null){try{player.release();}catch(Exception e){}player=null;}super.onDestroy();}
+}`:
 `package ${pkg};
-import android.app.Activity;import android.os.Bundle;import android.content.Intent;import android.graphics.Color;import android.view.Gravity;import android.view.animation.AlphaAnimation;import android.widget.LinearLayout;import android.widget.ImageView;import android.widget.TextView;
-public class SplashActivity extends Activity{private final android.os.Handler handler=new android.os.Handler();private void openMain(){startActivity(new Intent(this,MainActivity.class));finish();}@Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);box.setGravity(Gravity.CENTER);box.setBackgroundColor(Color.BLACK);ImageView img=new ImageView(this);img.setImageResource(${cfg.icon?'R.drawable.app_icon':'android.R.drawable.sym_def_app_icon'});img.setScaleType(ImageView.ScaleType.CENTER_INSIDE);box.addView(img,new LinearLayout.LayoutParams(112,112));${splashMode==='name'?`TextView name=new TextView(this);name.setText("${java(cfg.name)}");name.setTextColor(Color.WHITE);name.setTextSize(17);name.setGravity(Gravity.CENTER);LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(-2,-2);np.topMargin=18;box.addView(name,np);`:''}setContentView(box);${splashMode==='icon'?`handler.postDelayed(new Runnable(){public void run(){openMain();}},900);`: `AlphaAnimation a=new AlphaAnimation(0f,1f);a.setDuration(450);a.setAnimationListener(new android.view.animation.Animation.AnimationListener(){public void onAnimationStart(android.view.animation.Animation x){}public void onAnimationRepeat(android.view.animation.Animation x){}public void onAnimationEnd(android.view.animation.Animation x){AlphaAnimation out=new AlphaAnimation(1f,0f);out.setDuration(450);out.setStartOffset(650);out.setAnimationListener(new android.view.animation.Animation.AnimationListener(){public void onAnimationStart(android.view.animation.Animation x){}public void onAnimationRepeat(android.view.animation.Animation x){}public void onAnimationEnd(android.view.animation.Animation x){openMain();}});box.startAnimation(out);}});box.startAnimation(a);`}}`;
+import android.app.Activity;import android.os.Bundle;import android.content.Intent;import android.graphics.Color;import android.view.Gravity;import android.view.View;import android.view.animation.AlphaAnimation;import android.widget.FrameLayout;import android.widget.ImageView;import android.widget.TextView;
+public class SplashActivity extends Activity{private final android.os.Handler handler=new android.os.Handler();private void openMain(){startActivity(new Intent(this,MainActivity.class));finish();}@Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);FrameLayout root=new FrameLayout(this);root.setBackgroundColor(Color.BLACK);ImageView img=new ImageView(this);img.setImageResource(${cfg.icon?'R.drawable.app_icon':'android.R.drawable.sym_def_app_icon'});img.setScaleType(ImageView.ScaleType.CENTER_INSIDE);FrameLayout.LayoutParams ip=new FrameLayout.LayoutParams(180,180,Gravity.CENTER);root.addView(img,ip);${splashMode==='name'?`TextView name=new TextView(this);name.setText("${java(cfg.name)}");name.setTextColor(Color.WHITE);name.setTextSize(17);name.setGravity(Gravity.CENTER);FrameLayout.LayoutParams np=new FrameLayout.LayoutParams(-2,-2,Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);np.topMargin=125;root.addView(name,np);`:''}setContentView(root);${splashMode==='icon'?`handler.postDelayed(new Runnable(){public void run(){openMain();}},900);`:`img.setAlpha(0f);if(${splashMode==='name'?'true':'false'}){}img.animate().alpha(1f).setDuration(450).withEndAction(new Runnable(){public void run(){handler.postDelayed(new Runnable(){public void run(){img.animate().alpha(0f).setDuration(450).withEndAction(new Runnable(){public void run(){openMain();}}).start();}},650);}}).start();`}}`;
     write(path.join(dir,'app/src/main/java',...pkg.split('.'),'SplashActivity.java'),splashJava);
   }
   const load=isHtml?'web.loadUrl("file:///android_asset/index.html");':`web.loadUrl("${java(url)}");`;
@@ -166,7 +176,6 @@ public class SplashActivity extends Activity{private final android.os.Handler ha
   const reload=cfg.reloadMode||'none';
   const touch=reload==='tap'?`private long lastTap=0;`:'private long lastTap=0;';
   const touchBlock=reload==='tap'?`web.setOnTouchListener(new android.view.View.OnTouchListener(){public boolean onTouch(android.view.View v,android.view.MotionEvent e){if(e.getAction()==android.view.MotionEvent.ACTION_UP){long now=android.os.SystemClock.elapsedRealtime();if(lastTap>0 && now-lastTap<=450){web.reload();lastTap=0;}else{lastTap=now;}}return false;}});`:'';
-  const swipe=reload==='pull'?`androidx.swiperefreshlayout.widget.SwipeRefreshLayout`:'none';
   // Pull-to-refresh uses a dependency-free WebView touch gesture detector to avoid changing the existing Gradle engine.
   const pull=reload==='pull'?`private float downY;private boolean moved=false;`:'private float downY;private boolean moved=false;';
   const pullBlock=reload==='pull'?`web.setOnTouchListener(new android.view.View.OnTouchListener(){public boolean onTouch(android.view.View v,android.view.MotionEvent e){if(e.getAction()==android.view.MotionEvent.ACTION_DOWN){downY=e.getY();moved=false;}else if(e.getAction()==android.view.MotionEvent.ACTION_MOVE&&e.getY()-downY>100&&web.getScrollY()<=0){moved=true;}else if(e.getAction()==android.view.MotionEvent.ACTION_UP&&moved){web.reload();downY=0;moved=false;}return false;}});`:'';
@@ -236,6 +245,7 @@ function validateConfig(cfg){
   if(cfg.splashMode && !['none','icon','fade','name','video'].includes(cfg.splashMode)) throw new Error('Invalid splash mode');
   if(cfg.splashMode==='video' && !cfg.splashVideo) throw new Error('Splash video is required for video mode');
   if(cfg.reloadMode && !['none','pull','tap'].includes(cfg.reloadMode)) throw new Error('Invalid reload mode');
+  if(cfg.orientation && !['portrait','landscape','unspecified'].includes(cfg.orientation)) throw new Error('Invalid orientation');
   if(cfg.permissions && typeof cfg.permissions!=='object') throw new Error('Invalid permissions');
 }
 
@@ -301,7 +311,7 @@ function validateGeneratedProject(dir,cfg){
   if(cfg.reloadMode==='tap' && !main.includes('OnTouchListener')) throw new Error('Konfigurasi tap 2x gagal dibuat');
 }
 
-async function build(cfg,onProgress=()=>{}){
+async function build(cfg,onProgress=()=>{},signal=null){
   validateConfig(cfg);
   const dir=path.join(ROOT,crypto.randomUUID());mkdir(dir);
   try{
@@ -309,7 +319,7 @@ async function build(cfg,onProgress=()=>{}){
     project(cfg,dir);
     validateGeneratedProject(dir,cfg);
     onProgress(25,"Android project prepared and validated...");
-    await run(GRADLE,["--no-daemon","--stacktrace","--console=plain","assembleDebug"],dir,270000,onProgress);
+    await run(GRADLE,["--no-daemon","--stacktrace","--console=plain","assembleDebug"],dir,270000,onProgress,signal);
     onProgress(99,"Verifying APK...");
     const apk=path.join(dir,"app/build/outputs/apk/debug/app-debug.apk");
     if(!fs.existsSync(apk))throw new Error("APK was not produced");
@@ -323,27 +333,33 @@ async function build(cfg,onProgress=()=>{}){
 function jsonLine(obj){return JSON.stringify(obj)+"\n";}
 async function handleBuild(req,res){
   let cfg;
+  const abortController=new AbortController();
+  let disconnected=false;
+  res.on("close",()=>{if(!res.writableEnded){disconnected=true;abortController.abort();}});
   try{cfg=await parseBody(req);validateConfig(cfg);}catch(e){return send(res,400,e.message);}
   res.writeHead(200,{"Content-Type":"application/x-ndjson; charset=utf-8","Cache-Control":"no-store","X-Accel-Buffering":"no"});
   const writeEvent=(type,payload={})=>{try{res.write(jsonLine({type,...payload}));}catch{}};
-  writeEvent("started",{message:"Build started"});
+  const buildId="WTA-"+crypto.randomBytes(3).toString("hex").toUpperCase();
+  writeEvent("started",{message:"Build started",buildId});
   let result;
   try{
     result=await build(cfg,(progress,message)=>{
       const p=progress==null?undefined:Math.max(1,Math.min(99,progress));
       writeEvent("progress",{progress:p,message});
-    });
+    },abortController.signal);
+    if(disconnected) return;
     const data=fs.readFileSync(result.apk).toString("base64");
-    writeEvent("completed",{progress:100,message:"Build complete",name:result.name,size:result.size,apk:data});
+    writeEvent("completed",{progress:100,message:"Build complete",name:result.name,size:result.size,apk:data,buildId});
   }catch(e){
-    writeEvent("failed",{progress:100,message:e.message});
+    if(disconnected || e.name==="AbortError" || /aborted|SIGKILL/i.test(e.message||"")) return;
+    writeEvent("failed",{progress:100,message:e.message,buildId});
   }
-  res.end();
+  if(!disconnected) res.end();
 }
 
 const server=http.createServer(async(req,res)=>{
   const u=new URL(req.url,"http://localhost");
-  if(req.method==="GET" && u.pathname==="/health") return send(res,200,JSON.stringify({ok:true,engine:"android-webview",version:"1.3.2"}),"application/json");
+  if(req.method==="GET" && u.pathname==="/health") return send(res,200,JSON.stringify({ok:true,engine:"android-webview",version:"1.5.0",node:process.version,sdk:SDK,gradle:"Gradle + Android Gradle Plugin 8.11.1"}),"application/json");
   if(req.method==="GET" && u.pathname==="/_preview") return previewProxy(req,res);
   if(req.method==="GET" && (u.pathname==="/font/twin.ttf" || u.pathname==="/font/twin.tff")){
     const f=path.join(__dirname,"public/font/twin.ttf");
@@ -361,5 +377,5 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="POST" && u.pathname==="/api/build") return handleBuild(req,res);
   send(res,404,"Not found");
 });
-if(require.main===module) server.listen(PORT,"0.0.0.0",()=>console.log("Web to APK server v1.3.2 listening on "+PORT));
+if(require.main===module) server.listen(PORT,"0.0.0.0",()=>console.log("Web to APK server v1.5.0 listening on "+PORT));
 module.exports={project,validateConfig,normalizeHtml,writeIcon,writeSplashVideo,versionCode,versionName};
