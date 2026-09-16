@@ -490,7 +490,7 @@ async function handleBuild(req,res){
 
 const server=http.createServer(async(req,res)=>{
   const u=new URL(req.url,"http://localhost");
-  if(req.method==="GET" && u.pathname==="/health") return send(res,200,JSON.stringify({ok:true,engine:"android-webview",version:"1.5.5",node:process.version,sdk:SDK,gradle:"Gradle + Android Gradle Plugin 8.11.1"}),"application/json");
+  if(req.method==="GET" && u.pathname==="/health") return send(res,200,JSON.stringify({ok:true,engine:"android-webview",version:"1.5.6",node:process.version,sdk:SDK,gradle:"Gradle + Android Gradle Plugin 8.11.1"}),"application/json");
   if(req.method==="GET" && u.pathname==="/_preview") return previewProxy(req,res);
   if(req.method==="GET" && (u.pathname==="/font/twin.ttf" || u.pathname==="/font/twin.tff")){
     const f=path.join(__dirname,"public/font/twin.ttf");
@@ -509,5 +509,5 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="POST" && u.pathname==="/api/build") return handleBuild(req,res);
   send(res,404,"Not found");
 });
-if(require.main===module) server.listen(PORT,"0.0.0.0",()=>console.log("Web to APK server v1.5.5 listening on "+PORT));
+if(require.main===module) server.listen(PORT,"0.0.0.0",()=>console.log("Web to APK server v1.5.6 listening on "+PORT));
 module.exports={project,validateConfig,normalizeHtml,writeIcon,writeSplashVideo,versionCode,versionName,prepareOfflineBundle};
