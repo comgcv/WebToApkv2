@@ -11,6 +11,9 @@ const SDK = process.env.ANDROID_SDK_ROOT || "/opt/android-sdk";
 const MAX_ICON = 2 * 1024 * 1024;
 const MAX_HTML = 3 * 1024 * 1024;
 const MAX_SPLASH_VIDEO = 12 * 1024 * 1024;
+const MAX_OFFLINE_TOTAL = 18 * 1024 * 1024;
+const MAX_OFFLINE_FILE = 4 * 1024 * 1024;
+const MAX_OFFLINE_FILES = 80;
 
 fs.mkdirSync(ROOT, { recursive: true });
 
@@ -93,10 +96,98 @@ function normalizeHtml(source){
   html=html.replace(/url\(\s*['"]?twin\.tff['"]?\s*\)/gi,"url('font/twin.ttf')");
   return html;
 }
+function offlineSkip(u){return /^(?:data:|javascript:|mailto:|tel:|#|blob:|about:)/i.test(String(u||''));}
+function offlineExt(type,url){
+  const m=String(url||'').split('?')[0].match(/\.([a-z0-9]{1,8})$/i);
+  if(m)return m[1].toLowerCase();
+  const t=String(type||'').split(';')[0].toLowerCase();
+  return ({'text/css':'css','application/javascript':'js','text/javascript':'js','application/json':'json','image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/svg+xml':'svg','image/gif':'gif','font/woff':'woff','font/woff2':'woff2','font/ttf':'ttf','font/otf':'otf','audio/mpeg':'mp3','audio/ogg':'ogg','video/mp4':'mp4'})[t]||'bin';
+}
+async function fetchOfflineResource(u){
+  const r=await fetch(u,{redirect:'follow',headers:{'User-Agent':'WebToAPKStudio Offline Packager/1.5.4','Accept':'*/*'}});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const type=r.headers.get('content-type')||'application/octet-stream';
+  const ab=await r.arrayBuffer();
+  const buf=Buffer.from(ab);
+  if(buf.length>MAX_OFFLINE_FILE)throw new Error('file exceeds 4 MB');
+  return {buf,type,url:r.url||u};
+}
+async function prepareOfflineBundle(cfg,dir){
+  const assetsRoot=path.join(dir,'app/src/main/assets');
+  mkdir(assetsRoot);
+  let html='';
+  let baseUrl=null;
+  const warnings=[]; const files=new Map(); let total=0;
+  const queue=[];
+  if(cfg.sourceType==='html'){
+    html=normalizeHtml(cfg.html);
+  }else{
+    const target=new URL(cfg.url);
+    baseUrl=target.href;
+    const page=await fetchOfflineResource(target.href);
+    if(!/^text\/html|application\/xhtml\+xml/i.test(page.type))throw new Error('Offline mode membutuhkan halaman HTML dari URL. Content-Type: '+page.type);
+    html=page.buf.toString('utf8');
+    const finalUrl=page.url||target.href;
+    baseUrl=finalUrl;
+  }
+  const pageOrigin=baseUrl?new URL(baseUrl).origin:null;
+  const fileFor=(u,type)=>{
+    const x=new URL(u);
+    const hash=crypto.createHash('sha1').update(x.href).digest('hex').slice(0,10);
+    const ext=offlineExt(type,x.pathname);
+    return 'offline/'+hash+(ext?'_'+safe(path.basename(x.pathname).replace(/\.[^.]+$/,'')):'')+'.'+ext;
+  };
+  const addUrl=async(raw,base)=>{
+    if(offlineSkip(raw))return null;
+    let abs; try{abs=new URL(raw,base||baseUrl||undefined);}catch{return null;}
+    if(!/^https?:$/i.test(abs.protocol))return null;
+    if(pageOrigin && abs.origin!==pageOrigin){warnings.push('Resource eksternal tidak dipaketkan: '+abs.origin);return null;}
+    if(files.has(abs.href))return files.get(abs.href).local;
+    if(files.size>=MAX_OFFLINE_FILES){warnings.push('Batas '+MAX_OFFLINE_FILES+' resource offline tercapai.');return null;}
+    try{
+      const r=await fetchOfflineResource(abs.href);
+      if(total+r.buf.length>MAX_OFFLINE_TOTAL)throw new Error('total offline bundle exceeds 18 MB');
+      const local=fileFor(r.url||abs.href,r.type);
+      files.set(abs.href,{local,type:r.type,buf:r.buf,url:r.url||abs.href}); total+=r.buf.length;
+      queue.push(files.get(abs.href));
+      return local;
+    }catch(e){warnings.push('Resource gagal dipaketkan: '+abs.href+' ('+e.message+')');return null;}
+  };
+  // First pass: HTML src/href/action and common inline style url().
+  const attrRe=/\b(src|href|poster|action)=(['"])(.*?)\2/gi;
+  const attrs=[]; let m;
+  while((m=attrRe.exec(html)))attrs.push({start:m.index,attr:m[1],quote:m[2],value:m[3]});
+  for(const a of attrs){
+    const local=await addUrl(a.value,baseUrl); if(local){const replacement=a.attr+'='+a.quote+local+a.quote; html=html.slice(0,a.start)+replacement+html.slice(a.start+a.attr.length+a.quote.length+a.value.length+a.quote.length); attrRe.lastIndex=a.start+replacement.length;}
+  }
+  // Download CSS files referenced by the HTML and recursively package url() assets.
+  const cssEntries=[...files.values()].filter(x=>/text\/css/i.test(x.type)||/\.css$/i.test(x.url));
+  for(let i=0;i<cssEntries.length;i++){
+    const entry=cssEntries[i]; let css=entry.buf.toString('utf8'); const cssBase=entry.url;
+    const urls=[]; const re=/url\(\s*(['"]?)(.*?)\1\s*\)/gi; let cm;
+    while((cm=re.exec(css)))urls.push({start:cm.index,value:cm[2],full:cm[0]});
+    for(const u of urls){const local=await addUrl(u.value,cssBase);if(local){const cssLocal='../'+local;const old=u.full;const next=old.replace(u.value,cssLocal);css=css.slice(0,u.start)+next+css.slice(u.start+old.length);re.lastIndex=u.start+next.length;}}
+    entry.buf=Buffer.from(css); entry.type='text/css';
+  }
+  // Save packaged resources and rewrite HTML/CSS references.
+  for(const entry of files.values())write(path.join(assetsRoot,entry.local),entry.buf);
+  // Re-run HTML replacements cleanly using URL lookup map to avoid offset drift.
+  html=html.replace(/\b(src|href|poster|action)=(['"])(.*?)\2/gi,(full,attr,q,value)=>{
+    if(offlineSkip(value))return full;
+    let abs;try{abs=new URL(value,baseUrl||undefined)}catch{return full;}
+    const hit=files.get(abs.href);return hit?attr+'='+q+hit.local+q:full;
+  });
+  // Inline CSS url() in the HTML can reference same-origin resources too.
+  const htmlCssUrls=[]; const hre=/url\(\s*(['"]?)(.*?)\1\s*\)/gi; let hm;
+  while((hm=hre.exec(html)))htmlCssUrls.push({value:hm[2]});
+  for(const u of htmlCssUrls){const abs=(()=>{try{return new URL(u.value,baseUrl||undefined)}catch{return null}})();const hit=abs&&files.get(abs.href);if(hit)html=html.replaceAll(u.value,hit.local);}
+  write(path.join(assetsRoot,'index.html'),html);
+  write(path.join(assetsRoot,'offline-manifest.json'),JSON.stringify({mode:'static-offline',files:files.size,totalBytes:total,warnings},null,2));
+  return {files:files.size,totalBytes:total,warnings};
+}
 function htmlFileFromConfig(cfg,dir){
   const html=normalizeHtml(cfg.html);
-  const htmlPath=path.join(dir,"app/src/main/assets/index.html");
-  write(htmlPath, html);
+  write(path.join(dir,"app/src/main/assets/index.html"), html);
 }
 function writeIcon(cfg,dir){
   if(!cfg.icon) return;
@@ -116,14 +207,17 @@ function writeSplashVideo(cfg,dir){
   write(path.join(dir,"app/src/main/res/raw/splash.mp4"),buf);
   return true;
 }
-function project(cfg,dir){
+async function project(cfg,dir){
   const pkg=packageName(cfg.pkg), app=safe(cfg.name), isHtml=cfg.sourceType==='html', url=isHtml?'':cfg.url;
+  const offline=!!cfg.offlineMode;
+  let offlineInfo=null;
   const vName=versionName(cfg.version), vCode=versionCode(vName), fullscreen=!!cfg.fullscreen;
   const orientation=['portrait','landscape','unspecified'].includes(cfg.orientation)?cfg.orientation:'portrait';
   const permissions=cfg.permissions||{};
   const splashMode=['none','icon','fade','name','video'].includes(cfg.splashMode)?cfg.splashMode:'none';
   const hasSplash=splashMode!=='none' && (splashMode==='video'?!!cfg.splashVideo:true);
   if(cfg.platform && cfg.platform!=='android') throw new Error('Only Android builds are supported currently');
+  if(cfg.offlineMode && typeof cfg.offlineMode!=='boolean') throw new Error('Invalid offline mode setting');
   write(path.join(dir,'settings.gradle'),`pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
 dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
 rootProject.name="${app}"
@@ -147,13 +241,13 @@ android { namespace '${pkg}'; compileSdk 36
   write(path.join(dir,'app/src/main/AndroidManifest.xml'),`<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 ${permLines.join('\n')}
-<uses-permission android:name="android.permission.INTERNET"/>
+${offline?"":"<uses-permission android:name=\"android.permission.INTERNET\"/>"}
 <application android:theme="@style/AppTheme" android:label="${xml(cfg.name)}" ${iconLine} android:usesCleartextTraffic="true" android:hardwareAccelerated="true">
 ${splashActivity}
 <activity android:name=".MainActivity" android:screenOrientation="${fullscreen?'unspecified':orientation}" android:exported="true">${launcher}</activity>
 </application></manifest>`);
   write(path.join(dir,'app/src/main/res/values/styles.xml'),`<resources><style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#171922</item><item name="android:windowNoTitle">true</item></style></resources>`);
-  if(isHtml){htmlFileFromConfig(cfg,dir);const fontSrc=path.join(__dirname,'public/font/twin.ttf');if(fs.existsSync(fontSrc)){write(path.join(dir,'app/src/main/assets/font/twin.ttf'),fs.readFileSync(fontSrc));write(path.join(dir,'app/src/main/assets/font/twin.tff'),fs.readFileSync(fontSrc));}}
+  if(offline){offlineInfo=await prepareOfflineBundle(cfg,dir);}else if(isHtml){htmlFileFromConfig(cfg,dir);const fontSrc=path.join(__dirname,'public/font/twin.ttf');if(fs.existsSync(fontSrc)){write(path.join(dir,'app/src/main/assets/font/twin.ttf'),fs.readFileSync(fontSrc));write(path.join(dir,'app/src/main/assets/font/twin.tff'),fs.readFileSync(fontSrc));}}
   if(cfg.icon)writeIcon(cfg,dir);
   if(splashMode==='video')writeSplashVideo(cfg,dir);
   if(hasSplash){
@@ -168,10 +262,10 @@ public class SplashActivity extends Activity{
 }`:
 `package ${pkg};
 import android.app.Activity;import android.os.Bundle;import android.content.Intent;import android.graphics.Color;import android.view.Gravity;import android.view.View;import android.view.animation.AlphaAnimation;import android.widget.FrameLayout;import android.widget.ImageView;import android.widget.TextView;
-public class SplashActivity extends Activity{private final android.os.Handler handler=new android.os.Handler();private void openMain(){startActivity(new Intent(this,MainActivity.class));finish();}@Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);FrameLayout root=new FrameLayout(this);root.setBackgroundColor(Color.BLACK);ImageView img=new ImageView(this);img.setImageResource(${cfg.icon?'R.drawable.app_icon':'android.R.drawable.sym_def_app_icon'});img.setScaleType(ImageView.ScaleType.CENTER_INSIDE);FrameLayout.LayoutParams ip=new FrameLayout.LayoutParams(180,180,Gravity.CENTER);root.addView(img,ip);${splashMode==='name'?`TextView name=new TextView(this);name.setText("${java(cfg.name)}");name.setTextColor(Color.WHITE);name.setTextSize(17);name.setGravity(Gravity.CENTER);FrameLayout.LayoutParams np=new FrameLayout.LayoutParams(-2,-2,Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);np.topMargin=125;root.addView(name,np);`:''}setContentView(root);${splashMode==='icon'?`handler.postDelayed(new Runnable(){public void run(){openMain();}},900);`:`img.setAlpha(0f);if(${splashMode==='name'?'true':'false'}){}img.animate().alpha(1f).setDuration(450).withEndAction(new Runnable(){public void run(){handler.postDelayed(new Runnable(){public void run(){img.animate().alpha(0f).setDuration(450).withEndAction(new Runnable(){public void run(){openMain();}}).start();}},650);}}).start();`}}`;
+public class SplashActivity extends Activity{private final android.os.Handler handler=new android.os.Handler();private void openMain(){startActivity(new Intent(this,MainActivity.class));finish();}@Override public void onCreate(Bundle b){super.onCreate(b);getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);FrameLayout root=new FrameLayout(this);root.setBackgroundColor(Color.BLACK);ImageView img=new ImageView(this);img.setImageResource(${cfg.icon?'R.drawable.app_icon':'android.R.drawable.sym_def_app_icon'});img.setScaleType(ImageView.ScaleType.CENTER_INSIDE);FrameLayout.LayoutParams ip=new FrameLayout.LayoutParams(180,180,Gravity.CENTER);root.addView(img,ip);${splashMode==='name'?`TextView name=new TextView(this);name.setText("${java(cfg.name)}");name.setTextColor(Color.WHITE);name.setTextSize(17);name.setGravity(Gravity.CENTER);FrameLayout.LayoutParams np=new FrameLayout.LayoutParams(-2,-2,Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);np.topMargin=125;root.addView(name,np);`:''}setContentView(root);${splashMode==='icon'?`handler.postDelayed(new Runnable(){public void run(){openMain();}},900);`:`img.setAlpha(0f);if(${splashMode==='name'?'true':'false'}){}img.animate().alpha(1f).setDuration(450).withEndAction(new Runnable(){public void run(){handler.postDelayed(new Runnable(){public void run(){img.animate().alpha(0f).setDuration(450).withEndAction(new Runnable(){public void run(){openMain();}}).start();}},650);}}).start();`}}}`;
     write(path.join(dir,'app/src/main/java',...pkg.split('.'),'SplashActivity.java'),splashJava);
   }
-  const load=isHtml?'web.loadUrl("file:///android_asset/index.html");':`web.loadUrl("${java(url)}");`;
+  const load=(isHtml||offline)?'web.loadUrl("file:///android_asset/index.html");':`web.loadUrl("${java(url)}");`;
   const fsPart=fullscreen?`private void applyFullscreen(){final int flags=android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|android.view.View.SYSTEM_UI_FLAG_FULLSCREEN|android.view.View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|android.view.View.SYSTEM_UI_FLAG_LAYOUT_STABLE|android.view.View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|android.view.View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;getWindow().getDecorView().setSystemUiVisibility(flags);}`:`private void applyFullscreen(){}`;
   const reload=cfg.reloadMode||'none';
   const touch=reload==='tap'?`private long lastTap=0;`:'private long lastTap=0;';
@@ -185,7 +279,7 @@ public class SplashActivity extends Activity{private final android.os.Handler ha
   write(path.join(dir,'app/src/main/java',...pkg.split('.'),'MainActivity.java'),`package ${pkg};
 import android.app.Activity;import android.os.Bundle;import android.webkit.*;import android.view.*;import android.graphics.Color;import android.content.pm.PackageManager;
 public class MainActivity extends Activity{WebView web;${touch}${pull}
- @Override public void onCreate(Bundle b){super.onCreate(b);web=new WebView(this);WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setDatabaseEnabled(true);s.setLoadWithOverviewMode(true);s.setUseWideViewPort(true);s.setMediaPlaybackRequiresUserGesture(false);s.setAllowFileAccess(true);s.setAllowContentAccess(true);web.setWebViewClient(new WebViewClient());web.setWebChromeClient(${chrome});getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);${touchBlock}${pullBlock}setContentView(web);${load};requestSelectedPermissions();applyFullscreen();}
+ @Override public void onCreate(Bundle b){super.onCreate(b);web=new WebView(this);WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setDatabaseEnabled(true);s.setLoadWithOverviewMode(true);s.setUseWideViewPort(true);s.setMediaPlaybackRequiresUserGesture(false);s.setAllowFileAccess(true);s.setAllowContentAccess(true);s.setAllowFileAccessFromFileURLs(true);s.setAllowUniversalAccessFromFileURLs(false);web.setWebViewClient(new WebViewClient());web.setWebChromeClient(${chrome});getWindow().setStatusBarColor(Color.BLACK);getWindow().setNavigationBarColor(Color.BLACK);${touchBlock}${pullBlock}setContentView(web);${load};requestSelectedPermissions();applyFullscreen();}
  private void requestSelectedPermissions(){String[] p={${permArray}};if(android.os.Build.VERSION.SDK_INT<23||p.length==0)return;if(android.os.Build.VERSION.SDK_INT<33&&p.length>0){java.util.ArrayList<String> a=new java.util.ArrayList<>();for(String x:p)if(!x.equals("android.permission.POST_NOTIFICATIONS"))a.add(x);p=a.toArray(new String[0]);}if(p.length>0)requestPermissions(p,700);}
  @Override public void onRequestPermissionsResult(int r,String[] p,int[] g){super.onRequestPermissionsResult(r,p,g);}
  @Override public void onWindowFocusChanged(boolean h){super.onWindowFocusChanged(h);if(h)applyFullscreen();}@Override public void onBackPressed(){if(web!=null&&web.canGoBack())web.goBack();else super.onBackPressed();}${fsPart}}
@@ -256,6 +350,7 @@ async function inspectSource(cfg){
   checks.push('Version valid');
   checks.push('Package APK valid');
   checks.push('Konfigurasi fullscreen valid');
+  if(cfg.offlineMode) warnings.push('Offline Mode membuat snapshot statis lokal. API, login online, WebSocket, database cloud, dan resource yang gagal diunduh tidak akan bekerja tanpa internet.');
   if(cfg.sourceType==='html'){
     const html=String(cfg.html||'');
     if(!/<html(?:\s|>)/i.test(html)) throw new Error('File HTML tidak memiliki tag <html> yang valid');
@@ -280,6 +375,42 @@ async function inspectSource(cfg){
     }finally{clearTimeout(timer)}
   }
   return {ok:true,checks,warnings};
+}
+
+async function checkOfflineCompatibility(cfg){
+  validateConfig(cfg);
+  const temp=path.join(ROOT,'offline-check-'+crypto.randomUUID());
+  mkdir(temp);
+  try{
+    let source='';
+    if(cfg.sourceType==='url'){
+      const page=await fetchOfflineResource(cfg.url);
+      source=page.buf.toString('utf8');
+    }else source=normalizeHtml(cfg.html);
+    const dynamic=[];
+    const dynamicRules=[
+      [/\bWebSocket\s*\(/i,'WebSocket'],[/\bEventSource\s*\(/i,'EventSource'],[/\bfetch\s*\(/i,'fetch() API'],[/\bXMLHttpRequest\b/i,'XMLHttpRequest'],[/\baxios\b/i,'Axios'],[/\b(?:firebase|supabase)\b/i,'cloud SDK'],[/\bnavigator\.serviceWorker\b/i,'Service Worker']
+    ];
+    for(const [re,label] of dynamicRules)if(re.test(source))dynamic.push(label);
+    const external=[...source.matchAll(/(?:src|href|action)=["'](https?:\/\/[^"']+)["']/gi)].map(m=>m[1]);
+    const result=await prepareOfflineBundle(cfg,temp);
+    const warnings=[...result.warnings];
+    if(dynamic.length)warnings.push('Dynamic dependency terdeteksi: '+dynamic.join(', ')+'.');
+    if(external.length)warnings.push('Referensi URL absolut terdeteksi: '+external.length+' item; hanya resource yang diizinkan oleh packager yang dapat dilokalkan.');
+    const status=(warnings.length===0&&result.files>0)?'READY':(result.files>0?'PARTIAL':'NOT_SUITABLE');
+    return {ok:true,status,files:result.files,totalBytes:result.totalBytes,warnings,dynamicDependencies:dynamic,externalReferences:external.length,message:status==='READY'?'Source cocok untuk static offline packaging.':status==='PARTIAL'?'Source dapat dipaketkan sebagian, tetapi ada dependency yang tidak dapat dipastikan offline.':'Source tidak memiliki bundle offline yang cukup untuk dipakai.'};
+  }finally{
+    try{fs.rmSync(temp,{recursive:true,force:true});}catch{}
+  }
+}
+async function handleOfflineCheck(req,res){
+  try{
+    const cfg=await parseBody(req);
+    const out=await checkOfflineCompatibility(cfg);
+    return send(res,200,JSON.stringify(out),'application/json');
+  }catch(e){
+    return send(res,400,JSON.stringify({ok:false,status:'NOT_SUITABLE',errors:[e.message],warnings:[]}),'application/json');
+  }
 }
 
 async function handleInspect(req,res){
@@ -316,7 +447,7 @@ async function build(cfg,onProgress=()=>{},signal=null){
   const dir=path.join(ROOT,crypto.randomUUID());mkdir(dir);
   try{
     onProgress(12,"Validating configuration...");
-    project(cfg,dir);
+    await project(cfg,dir);
     validateGeneratedProject(dir,cfg);
     onProgress(25,"Android project prepared and validated...");
     await run(GRADLE,["--no-daemon","--stacktrace","--console=plain","assembleDebug"],dir,270000,onProgress,signal);
@@ -359,7 +490,7 @@ async function handleBuild(req,res){
 
 const server=http.createServer(async(req,res)=>{
   const u=new URL(req.url,"http://localhost");
-  if(req.method==="GET" && u.pathname==="/health") return send(res,200,JSON.stringify({ok:true,engine:"android-webview",version:"1.5.0",node:process.version,sdk:SDK,gradle:"Gradle + Android Gradle Plugin 8.11.1"}),"application/json");
+  if(req.method==="GET" && u.pathname==="/health") return send(res,200,JSON.stringify({ok:true,engine:"android-webview",version:"1.5.5",node:process.version,sdk:SDK,gradle:"Gradle + Android Gradle Plugin 8.11.1"}),"application/json");
   if(req.method==="GET" && u.pathname==="/_preview") return previewProxy(req,res);
   if(req.method==="GET" && (u.pathname==="/font/twin.ttf" || u.pathname==="/font/twin.tff")){
     const f=path.join(__dirname,"public/font/twin.ttf");
@@ -374,8 +505,9 @@ const server=http.createServer(async(req,res)=>{
     return send(res,200,fs.readFileSync(f),"application/javascript; charset=utf-8",{"Service-Worker-Allowed":"/"});
   }
   if(req.method==="POST" && u.pathname==="/api/inspect") return handleInspect(req,res);
+  if(req.method==="POST" && u.pathname==="/api/offline-check") return handleOfflineCheck(req,res);
   if(req.method==="POST" && u.pathname==="/api/build") return handleBuild(req,res);
   send(res,404,"Not found");
 });
-if(require.main===module) server.listen(PORT,"0.0.0.0",()=>console.log("Web to APK server v1.5.0 listening on "+PORT));
-module.exports={project,validateConfig,normalizeHtml,writeIcon,writeSplashVideo,versionCode,versionName};
+if(require.main===module) server.listen(PORT,"0.0.0.0",()=>console.log("Web to APK server v1.5.5 listening on "+PORT));
+module.exports={project,validateConfig,normalizeHtml,writeIcon,writeSplashVideo,versionCode,versionName,prepareOfflineBundle};
