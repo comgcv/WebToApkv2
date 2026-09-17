@@ -49,14 +49,19 @@ body.dark .side{background:rgba(18,21,28,.88);border-color:var(--line)}body.dark
 @media(max-width:1050px){.grid{grid-template-columns:1fr}.preview{min-height:560px}.settingGrid{grid-template-columns:1fr 1fr}}
 @media(max-width:650px){.main{margin-left:0;width:100%;padding:14px}.settingGrid,.row{grid-template-columns:1fr}.phone{width:min(330px,88vw)}}
 /* v1.5 build intelligence */
-.historyTools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.historySearch{flex:1;min-width:190px;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);padding:0 11px;font-size:10px}.filterBtn{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:9px;padding:8px 10px;font-size:8px}.filterBtn.active{background:#171922;color:#fff;border-color:#171922}.liveStage{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:12px 0}.stage{padding:8px 6px;border:1px solid var(--line);border-radius:9px;background:var(--soft);font-size:7px;text-align:center;color:var(--muted)}.stage.done{color:var(--ok);border-color:#bfe5d3}.stage.active{background:#171922;color:#fff;border-color:#171922}.modalActions{display:flex;gap:8px;flex-wrap:wrap}.dangerBtn{border:1px solid #e5bfc4;background:#fff3f4;color:#a33342;border-radius:10px;height:40px;padding:0 13px;font-size:10px}.copyBtn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:7px 9px;font-size:8px}/* v1.5.6 popup system */
+.historyTools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.historySearch{flex:1;min-width:190px;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);padding:0 11px;font-size:10px}.filterBtn{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:9px;padding:8px 10px;font-size:8px}.filterBtn.active{background:#171922;color:#fff;border-color:#171922}.liveStage{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:12px 0}.stage{padding:8px 6px;border:1px solid var(--line);border-radius:9px;background:var(--soft);font-size:7px;text-align:center;color:var(--muted)}.stage.done{color:var(--ok);border-color:#bfe5d3}.stage.active{background:#171922;color:#fff;border-color:#171922}.modalActions{display:flex;gap:8px;flex-wrap:wrap}.dangerBtn{border:1px solid #e5bfc4;background:#fff3f4;color:#a33342;border-radius:10px;height:40px;padding:0 13px;font-size:10px}.copyBtn{border:1px solid var(--line);background:var(--card);border-radius:9px;padding:7px 9px;font-size:8px}/* v1.5.7 popup system */
 .popupOverlay{position:fixed;inset:0;background:#17192266;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);z-index:300;display:none;align-items:center;justify-content:center;padding:18px}.popupOverlay.show{display:flex}.popupBox{width:min(440px,94vw);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 30px 100px #0004;animation:popupIn .18s ease-out}.popupIcon{width:42px;height:42px;border-radius:13px;background:var(--soft);display:grid;place-items:center;margin-bottom:13px;font-weight:900;font-size:14px}.popupIcon.ok{background:#eaf7f1;color:#16835b}.popupIcon.warn{background:#fff6df;color:#876400}.popupIcon.error{background:#fdeff1;color:#a13442}.popupTitle{font-size:14px;font-weight:850}.popupText{font-size:10px;color:var(--muted);line-height:1.6;margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere}.popupActions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;flex-wrap:wrap}.popupActions button{min-height:40px;border-radius:10px;padding:0 14px;font-size:9px}.popupPrimary{border:0;background:#171922;color:#fff}.popupSecondary{border:1px solid var(--line);background:var(--card);color:var(--ink)}.popupDanger{border:1px solid #e5bfc4;background:#fff3f4;color:#a33342}.popupDetails{margin-top:13px;border:1px solid var(--line);background:var(--soft);border-radius:11px;padding:11px;font:9px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;max-height:220px;overflow:auto}.buildConfirmGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.buildConfirmField{border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:10px}.buildConfirmField span{display:block;font-size:8px;color:var(--muted);margin-bottom:4px}.buildConfirmField b{display:block;font-size:10px;overflow-wrap:anywhere}@keyframes popupIn{from{opacity:0;transform:translateY(7px) scale(.98)}to{opacity:1;transform:none}}body.dark .popupOverlay{background:#0008}body.dark .popupDanger{background:#24171a;color:#f0aeb6;border-color:#533039}@media(max-width:520px){.buildConfirmGrid{grid-template-columns:1fr}.popupBox{padding:17px}}
 .cmdOverlay{position:fixed;inset:0;background:#17192255;backdrop-filter:blur(5px);z-index:200;display:none;place-items:start center;padding-top:12vh}.cmdOverlay.show{display:grid}.cmdBox{width:min(560px,92vw);background:var(--card);border:1px solid var(--line);border-radius:17px;box-shadow:0 30px 90px #0003;overflow:hidden}.cmdInput{width:100%;height:52px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);padding:0 16px;outline:0;font-size:12px}.cmdList{padding:7px;max-height:360px;overflow:auto}.cmdItem{width:100%;border:0;background:transparent;color:var(--ink);text-align:left;border-radius:9px;padding:11px;font-size:10px}.cmdItem:hover{background:var(--soft)}.envGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}.envField{padding:9px;border:1px solid var(--line);background:var(--soft);border-radius:10px}.envField span{display:block;color:var(--muted);font-size:8px}.envField b{display:block;margin-top:4px;font-size:9px;overflow-wrap:anywhere}.checksum{font-family:ui-monospace,monospace;font-size:8px;word-break:break-all;color:var(--muted);margin-top:8px}.warningBox{padding:10px 12px;border:1px solid #ead9a7;background:#fff8e7;color:#806000;border-radius:10px;font-size:8px;line-height:1.5;margin-top:10px}
 .finalPreviewGrid{align-items:stretch}.finalPreviewCard{min-height:680px}.finalPreviewBody{min-height:590px}.finalPreviewBody .phone{transition:.2s ease}.finalPreviewBody .phone.landscape{width:360px;height:230px}.finalPreviewBody .phone.fullscreen .phoneBar{display:none}.finalSummary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}.finalField{border:1px solid var(--line);background:var(--soft);border-radius:11px;padding:10px}.finalField span{display:block;font-size:8px;color:var(--muted);margin-bottom:4px}.finalField b{display:block;font-size:10px;overflow-wrap:anywhere}.finalPreviewBody iframe{display:block;width:100%;height:100%;border:0;background:#fff}.finalReadyOk{background:#eaf7f1!important;color:#16835b!important}.finalReadyBad{background:#fdeff1!important;color:#a13442!important}body.dark .finalReadyOk{background:#17271f!important;color:#82d5ad!important}body.dark .finalReadyBad{background:#24171a!important;color:#f0aeb6!important}@media(max-width:520px){.finalSummary{grid-template-columns:1fr}.finalPreviewBody .phone.landscape{width:330px;height:215px}}
 .offlineCard.offlineChecking{border-color:#9ea4af}.offlineCard.offlineChecking .offlineBadge{background:#171922;color:#fff}.offlineBadge.loading:before{content:"";display:inline-block;width:8px;height:8px;border:1.5px solid currentColor;border-right-color:transparent;border-radius:50%;margin-right:5px;vertical-align:-1px;animation:offlineSpin .7s linear infinite}@keyframes offlineSpin{to{transform:rotate(360deg)}}.offlineStatus{font-size:8px;color:var(--muted);margin-top:8px;line-height:1.5}.offlineStatus.ok{color:#16835b}.offlineStatus.warn{color:#8a6500}.offlineStatus.bad{color:#a13442}.offlineCard{margin-top:12px;border:1px solid var(--line);background:var(--soft);border-radius:14px;padding:13px}.offlineCard .toggle{margin:0}.offlineBadge{display:inline-flex;align-items:center;padding:4px 7px;border-radius:7px;background:#eaf7f1;color:#16835b;font-size:7px;font-weight:850;margin-left:6px}.offlineHint{font-size:8px;line-height:1.55;color:var(--muted);margin-top:8px}.offlineHint b{color:var(--ink)}body.dark .offlineBadge{background:#17271f;color:#82d5ad}body.dark .filterBtn,body.dark .historySearch,body.dark .copyBtn,body.dark .cmdInput{background:#11141b;color:var(--ink);border-color:var(--line)}body.dark .dangerBtn{background:#24171a;color:#f0aeb6;border-color:#533039}body.dark .warningBox{background:#2a2415;border-color:#5b4a1d;color:#e1c77b}
 @media(max-width:650px){.liveStage{grid-template-columns:1fr 1fr}.envGrid{grid-template-columns:1fr}}
 
-</style>
+/* V1.5.7 dashboard refresh + liquid navigation */
+.topnav{position:relative;display:flex;align-items:center;justify-content:center;gap:4px;width:min(720px,100%);margin:0 auto 24px;padding:7px;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:18px;box-shadow:0 14px 36px #17192212;backdrop-filter:blur(18px);overflow:visible}.topnav button{position:relative;display:flex;align-items:center;justify-content:center;gap:7px;min-width:112px;height:42px;padding:0 14px;border:0;background:transparent;color:#7b8290;border-radius:13px;font-size:9px;font-weight:800;white-space:nowrap;transition:.2s}.topnav button svg{width:16px;height:16px;flex:none;stroke:currentColor}.topnav button:hover{background:#f0f2f6;color:#171922;transform:translateY(-1px)}.topnav button.active{background:#171922;color:#fff;box-shadow:0 8px 18px #17192222}.topnav button:nth-child(2){min-width:64px;width:64px;flex:0 0 64px;height:58px;margin-top:-28px;border-radius:50%;background:var(--card);color:#171922;border:1px solid var(--line);box-shadow:0 10px 24px #17192225}.topnav button:nth-child(2) span{position:absolute;top:62px;font-size:7px;color:var(--muted);font-weight:800}.topnav button:nth-child(2).active{background:var(--card);color:#171922;border-color:var(--line)}
+.dashboardShell{display:grid;gap:16px}.dashboardHeader{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:4px 2px 0}.dashboardEyebrow{font-size:8px;font-weight:850;letter-spacing:1.7px;color:#969daa;text-transform:uppercase}.dashboardHeading{font-size:30px;font-weight:850;letter-spacing:-1.2px;margin-top:5px}.dashboardLead{font-size:10px;color:var(--muted);line-height:1.6;margin-top:6px;max-width:700px}.dashLive{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid var(--line);border-radius:11px;background:var(--card);font-size:8px;color:var(--muted);white-space:nowrap}.dashLive i{width:7px;height:7px;border-radius:50%;background:#20a36e;box-shadow:0 0 0 4px #20a36e18}
+.bannerCard{position:relative;overflow:hidden;border-radius:20px;background:#171922;min-height:190px;box-shadow:0 22px 55px #1719221c}.bannerCard img{display:block;width:100%;height:260px;object-fit:cover;border:0}.bannerOverlay{position:absolute;inset:0;background:linear-gradient(90deg,#0b0d12cc 0%,#0b0d1238 52%,transparent 100%);display:flex;align-items:flex-end;padding:24px}.bannerCopy{max-width:560px;color:#fff}.bannerCopy small{font-size:8px;letter-spacing:1.5px;opacity:.7}.bannerCopy b{display:block;font-size:22px;letter-spacing:-.5px;margin-top:5px}.bannerCopy span{display:block;font-size:9px;line-height:1.55;opacity:.8;margin-top:5px}.bannerEmpty{height:260px;display:grid;place-items:center;color:#fff;background:radial-gradient(circle at 20% 30%,#ffffff18,transparent 32%),linear-gradient(135deg,#171922,#30333e)}.bannerEmpty div{text-align:center}.bannerEmpty b{display:block;font-size:18px}.bannerEmpty span{display:block;font-size:8px;opacity:.7;margin-top:5px}.bannerUrlBox{display:flex;gap:7px;align-items:center;margin-top:10px}.bannerUrlBox input{flex:1;height:34px;border:1px solid #ffffff25;border-radius:9px;background:#ffffff10;color:#fff;padding:0 10px;font-size:8px;outline:0}.bannerUrlBox button{height:34px;border:1px solid #ffffff30;border-radius:9px;background:#fff;color:#171922;padding:0 10px;font-size:8px;font-weight:800}
+.dashStats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.dashStat{position:relative;overflow:hidden;padding:17px;border-radius:16px}.dashStat:after{content:"";position:absolute;width:90px;height:90px;right:-35px;top:-40px;border-radius:50%;background:#17192208}.dashStatHead{display:flex;align-items:center;justify-content:space-between;gap:8px}.dashStatIcon{width:30px;height:30px;border-radius:9px;background:var(--soft);display:grid;place-items:center;color:#525967}.dashStatIcon svg{width:15px;height:15px}.dashStat span{font-size:8px;color:var(--muted);font-weight:750}.dashStat b{display:block;font-size:25px;margin-top:9px;letter-spacing:-.5px}.dashStat em{font-style:normal;font-size:8px;color:var(--muted)}.dashStat.successStat b{color:#15845b}.dashStat.failStat b{color:#b43b48}
+.dashInfoGrid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:16px}.dashInfo{padding:20px}.dashSectionTitle{font-size:12px;font-weight:850}.dashSectionDesc{font-size:9px;color:var(--muted);line-height:1.6;margin-top:5px}.dashArticle{font-size:9px;color:#616876;line-height:1.8;margin-top:13px}.dashArticle strong{color:var(--ink)}.dashMeta{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.dashMetaItem{padding:11px;border:1px solid var(--line);background:var(--soft);border-radius:11px}.dashMetaItem span{display:block;font-size:7px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}.dashMetaItem b{display:block;font-size:9px;margin-top:4px;overflow-wrap:anywhere}.quickPanel{display:grid;gap:8px}.quickEditItem{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card)}.quickEditItem b{font-size:9px}.quickEditItem span{display:block;font-size:7px;color:var(--muted);margin-top:3px}.quickEditItem button{border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:8px;padding:7px 9px;font-size:8px;font-weight:800}.quickEditItem button:hover{background:#171922;color:#fff}.dashBottom{display:grid;grid-template-columns:1fr 1fr;gap:16px}.dashList{display:grid;gap:7px;margin-top:12px}.dashListItem{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:8px}.dashListItem:last-child{border-bottom:0}.dashListItem small{color:var(--muted)}body.dark .topnav{background:rgba(17,20,27,.9)}body.dark .topnav button:hover{background:#222631;color:#fff}body.dark .dashLive,body.dark .dashStat,body.dark .dashInfo,body.dark .quickEditItem{background:rgba(21,24,32,.92)}body.dark .dashMetaItem{background:#11141b}body.dark .dashStatIcon{background:#11141b;color:#b7bdc8}@media(max-width:900px){.topnav{width:100%;margin-bottom:18px;border-radius:16px}.topnav button{min-width:0;flex:1;height:44px;padding:0 8px}.topnav button:nth-child(2){min-width:64px;width:64px;flex:0 0 64px;height:58px;margin-top:-28px;border-radius:50%;background:var(--card);color:#171922;border:1px solid var(--line);box-shadow:0 10px 24px #17192225}.topnav button:nth-child(2) span{display:block;position:absolute;top:62px;font-size:7px;color:var(--muted);font-weight:800;white-space:nowrap}.topnav button span{display:none}.topnav button svg{width:18px;height:18px}.dashboardHeader{align-items:flex-start;flex-direction:column}.dashStats{grid-template-columns:1fr 1fr}.dashInfoGrid,.dashBottom{grid-template-columns:1fr}.bannerCard img,.bannerEmpty{height:210px}.bannerOverlay{padding:18px}.bannerCopy b{font-size:18px}}@media(max-width:520px){.dashboardHeading{font-size:25px}.dashMeta{grid-template-columns:1fr}.dashStats{gap:8px}.dashStat{padding:13px}.dashStat b{font-size:21px}.bannerUrlBox{display:flex}.bannerUrlBox input{min-width:0}.bannerUrlBox button{flex:none}.topnav{position:sticky;top:8px;z-index:30}.topnav button:nth-child(2){width:58px;min-width:58px;flex-basis:58px}}</style>
 
 <style>
 .studioGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
@@ -70,61 +75,134 @@ body.dark .side{background:rgba(18,21,28,.88);border-color:var(--line)}body.dark
 .studioBtns{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.studioBtns button{padding:8px 11px;border-radius:9px;border:1px solid var(--line,#252832);background:transparent;color:inherit;cursor:pointer}
 @media(max-width:700px){.studioGrid{grid-template-columns:1fr}}
 </style>
+
+<style>
+/* V1.5.12 bottom curved navigation */
+.side{display:none!important}.main{margin-left:0!important;width:100%!important;max-width:none!important;padding-bottom:132px}.topbtn.mobile{display:none!important}
+.topnav{position:fixed!important;left:50%!important;bottom:calc(16px + env(safe-area-inset-bottom))!important;top:auto!important;transform:translateX(-50%)!important;z-index:140!important;width:min(560px,calc(100vw - 28px))!important;height:72px!important;margin:0!important;padding:7px 9px!important;display:grid!important;grid-template-columns:1fr 1fr 1.15fr 1fr 1fr!important;align-items:center!important;gap:5px!important;border:1px solid rgba(229,231,236,.92)!important;border-radius:30px!important;background:rgba(255,255,255,.9)!important;box-shadow:0 18px 55px rgba(23,25,34,.16),0 3px 12px rgba(23,25,34,.08)!important;backdrop-filter:blur(22px)!important;overflow:visible!important}
+.topnav button,.topnav button:nth-child(2),.topnav button:nth-child(3){min-width:0!important;width:auto!important;height:54px!important;margin:0!important;flex:none!important;border:0!important;border-radius:20px!important;background:transparent!important;color:#7b8290!important;box-shadow:none!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-direction:column!important;gap:4px!important;padding:5px 7px!important;font-size:8px!important;font-weight:850!important;line-height:1!important;transition:transform .2s ease,background .2s ease,color .2s ease,box-shadow .2s ease!important}
+.topnav button svg{width:19px!important;height:19px!important;stroke-width:1.9!important}.topnav button span{position:static!important;display:block!important;font-size:8px!important;white-space:nowrap!important}
+.topnav button:hover{transform:translateY(-2px)!important;background:#f0f2f6!important;color:#171922!important}.topnav button.active{background:#171922!important;color:#fff!important;border-radius:18px!important;box-shadow:0 9px 22px rgba(23,25,34,.18)!important;transform:translateY(-1px)!important}
+.topnav .navBuild{position:relative!important;z-index:3!important;width:66px!important;height:66px!important;justify-self:center!important;margin-top:-31px!important;border-radius:50%!important;background:#171922!important;color:#fff!important;border:5px solid var(--bg)!important;box-shadow:0 13px 28px rgba(23,25,34,.25)!important}
+.topnav .navBuild svg{width:21px!important;height:21px!important}.topnav .navBuild span{font-size:7px!important;margin-top:1px!important}.topnav .navBuild:hover{background:#242731!important;color:#fff!important;transform:translateY(-3px)!important}.topnav .navBuild.active{background:#fff!important;color:#171922!important;border-color:var(--bg)!important;box-shadow:0 13px 28px rgba(23,25,34,.2)!important}
+.topnav .navBuild.active:before{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(23,25,34,.08);pointer-events:none}
+.bannerCard{border:0!important;border-radius:24px!important;box-shadow:0 22px 55px rgba(23,25,34,.16)!important}.bannerCard img{height:270px!important;border:0!important;border-radius:24px!important;object-fit:cover!important}.bannerFallbackOverlay{position:absolute;inset:0;display:none;place-items:center;color:#fff;background:linear-gradient(135deg,#171922,#30333e);z-index:0}.bannerFallbackOverlay div{text-align:center}.bannerFallbackOverlay b{display:block;font-size:18px}.bannerFallbackOverlay span{display:block;font-size:8px;opacity:.7;margin-top:5px}.bannerOverlay{border-radius:24px!important}.bannerUrlBox{display:none!important}
+body.dark .topnav{background:rgba(17,20,27,.9)!important;border-color:rgba(48,52,64,.9)!important;box-shadow:0 18px 55px rgba(0,0,0,.38)!important}body.dark .topnav button:hover{background:#222631!important;color:#fff!important}body.dark .topnav button.active{background:#f3f5f8!important;color:#11141b!important}body.dark .topnav .navBuild{border-color:var(--bg)!important;background:#f3f5f8!important;color:#11141b!important}.topnav .navBuild.active{background:#fff!important;color:#171922!important}
+@media(max-width:650px){.main{padding:14px 14px 124px!important}.topnav{width:calc(100vw - 22px)!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;height:68px!important;border-radius:27px!important;padding:6px 7px!important;grid-template-columns:1fr 1fr 1.05fr 1fr 1fr!important;gap:3px!important}.topnav button{height:52px!important;border-radius:18px!important;padding:4px 3px!important}.topnav button svg{width:18px!important;height:18px!important}.topnav button span{font-size:7px!important}.topnav .navBuild{width:60px!important;height:60px!important;margin-top:-27px!important;border-width:4px!important}.topnav .navBuild svg{width:20px!important;height:20px!important}.topnav .navBuild span{font-size:6.5px!important}.bannerCard img,.bannerFallbackOverlay{height:215px!important}.bannerCard,.bannerCard img,.bannerOverlay{border-radius:21px!important}.bannerOverlay{padding:16px!important}.bannerCopy b{font-size:17px!important}.bannerCopy span{font-size:8px!important}}
+.topTools{display:flex;align-items:center;gap:5px;padding:5px;border:1px solid var(--line);background:color-mix(in srgb,var(--card) 92%,transparent);border-radius:15px;box-shadow:0 8px 24px rgba(23,25,34,.08);backdrop-filter:blur(14px)}.topTools .topbtn{width:34px;min-width:34px;height:34px;border:0;background:transparent;box-shadow:none}.topTools .topbtn:hover{background:var(--soft)}.topTools .topbtn:active{transform:scale(.96)}.topTools #notificationCenterBtn{background:var(--soft)}.topTools #notificationCenterBtn:hover{background:var(--line)}body.dark .topTools{background:rgba(17,20,27,.88);border-color:var(--line)}@media(max-width:650px){.topTools{gap:2px;padding:4px;border-radius:13px}.topTools .topbtn{width:32px;min-width:32px;height:32px}.topTools .topbtn:nth-last-child(1){display:none}}
+</style>
+
+<style>
+/* V1.5.12 landing + theme studio + drawer sidebar */
+body{--accent:#171922;--accent-contrast:#fff;--custom-shadow:rgba(23,25,34,.16);--custom-radius:18px;--custom-button:var(--accent)}
+body.theme-custom{background:var(--custom-bg);--bg:var(--custom-bg);--line:color-mix(in srgb,var(--accent) 14%,#ffffff);--soft:color-mix(in srgb,var(--custom-bg) 88%,var(--accent));--ink:color-mix(in srgb,var(--accent) 86%,#111);--muted:color-mix(in srgb,var(--accent) 42%,#737b89)}
+body.theme-custom .primary,body.theme-custom .navBuild{background:var(--accent)!important;color:var(--accent-contrast)!important}
+body.theme-custom{background:var(--custom-bg)}
+body.theme-custom .card{background:var(--custom-card)!important}
+body.theme-custom .top,.body.theme-custom .top{background:transparent}
+body.theme-custom .topbtn{background:var(--custom-surface)!important}
+body.theme-custom .topnav{background:color-mix(in srgb,var(--custom-surface) 92%,transparent)!important}
+body.theme-custom .toggle,body.theme-custom .iconbox,body.theme-custom .htmlDrop,body.theme-custom .checkCard,body.theme-custom .settingCard,body.theme-custom .estimate,body.theme-custom .buildInfo,body.theme-custom .finalField,body.theme-custom .apkField,body.theme-custom .envField{background:var(--custom-soft)!important}
+body.theme-custom .card,body.theme-custom .dashLive,body.theme-custom .topbtn,body.theme-custom .side,.theme-custom .topnav{box-shadow:0 18px 50px var(--custom-shadow)}
+body.theme-custom .topnav button.active{background:var(--accent)!important;color:var(--accent-contrast)!important}
+body.theme-custom .topnav .navBuild.active{background:var(--accent-contrast)!important;color:var(--accent)!important}
+body.theme-custom.theme-3d{--custom-radius:24px}
+body.theme-3d .card,body.theme-3d .topbtn,body.theme-3d .side,.theme-3d .topnav,.theme-3d .dashStat,.theme-3d .dashLive{border-radius:var(--custom-radius);box-shadow:0 16px 0 color-mix(in srgb,var(--custom-shadow) 70%,transparent),0 28px 45px var(--custom-shadow);transform:translateY(0)}
+body.theme-3d .primary,body.theme-3d .secondary,body.theme-3d .topbtn,.theme-3d .nav button,.theme-3d .topnav button{border-radius:18px}
+body.theme-3d .bannerCard{box-shadow:0 18px 0 color-mix(in srgb,var(--custom-shadow) 65%,transparent),0 30px 55px var(--custom-shadow)!important}
+body.theme-3d .dashStatIcon{box-shadow:0 7px 0 color-mix(in srgb,var(--custom-shadow) 70%,transparent)}
+body.theme-comic{font-family:Inter,Twin,system-ui,-apple-system,Segoe UI,sans-serif}
+body.theme-comic .card,body.theme-comic .topnav,body.theme-comic .side,body.theme-comic .topbtn{border-width:2px;box-shadow:0 8px 0 var(--custom-shadow),0 20px 34px color-mix(in srgb,var(--custom-shadow) 45%,transparent)}
+body.theme-comic .primary,body.theme-comic .secondary,body.theme-comic .sourceTab,body.theme-comic .filebtn{border-radius:15px;border-width:2px}
+body.theme-comic .topnav button.active{box-shadow:0 6px 0 var(--custom-shadow)!important}
+body.theme-comic .navBuild{box-shadow:0 8px 0 var(--custom-shadow),0 18px 28px var(--custom-shadow)!important}
+body.theme-comic .card,body.theme-comic .topbtn,body.theme-comic .topnav,body.theme-comic .side{border-color:color-mix(in srgb,var(--accent) 28%,#111)!important}
+body.theme-comic .ctitle,body.theme-comic .dashSectionTitle,body.theme-comic .title{letter-spacing:-.3px}
+body.theme-comic .primary,body.theme-comic .navBuild{filter:saturate(1.12);text-shadow:1px 1px 0 rgba(0,0,0,.18)}
+body.theme-comic .card:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;background-image:radial-gradient(color-mix(in srgb,var(--accent) 16%,transparent) .7px,transparent .8px);background-size:7px 7px;opacity:.08}
+body.theme-comic .card{position:relative;overflow:hidden}
+.comicOnlyControl{display:none}
+body.theme-comic .comicOnlyControl{display:block}
+.side{display:block!important;transform:translateX(-110%);transition:transform .25s ease;box-shadow:18px 0 45px rgba(23,25,34,.12)}
+.side.open{transform:translateX(0)}
+.sideOverlay{position:fixed;inset:0;background:rgba(10,12,16,.28);backdrop-filter:blur(2px);z-index:45;display:none}.sideOverlay.show{display:block}
+.sideClose{position:absolute;right:14px;top:16px;width:30px;height:30px;border:1px solid var(--line);background:var(--card);border-radius:10px;color:var(--ink)}
+.side .brand{padding-right:42px}
+.sideTheme{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.sideThemeBtn{width:100%;border:1px solid var(--line);background:var(--soft);color:var(--ink);border-radius:13px;padding:11px 12px;display:flex;align-items:center;gap:9px;font-size:9px;font-weight:800;text-align:left}
+.sideThemeBtn svg{width:17px;height:17px;flex:none}.sideThemeBtn small{display:block;color:var(--muted);font-size:7px;margin-top:3px;font-weight:500}
+.topbtn{display:grid;place-items:center}.topbtn svg{width:17px;height:17px;stroke:currentColor}.menuTop{display:grid!important}
+.landingMode .top,.landingMode .topnav,.landingMode #notice,.landingMode .sideOverlay{display:none!important}.landingMode .main{margin:0!important;width:100%!important;max-width:none!important;padding:0!important}.landingMode .page{display:none!important}.landingMode #landing{display:flex!important}
+#landing{min-height:100vh;align-items:center;justify-content:center;padding:28px;position:relative;overflow:hidden;background:radial-gradient(circle at 20% 20%,rgba(23,25,34,.07),transparent 34%),radial-gradient(circle at 85% 70%,rgba(23,25,34,.06),transparent 32%),var(--bg)}
+.landingWrap{width:min(1120px,100%);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:28px;align-items:center}.landingEyebrow{font-size:8px;letter-spacing:2px;font-weight:900;color:var(--muted)}.landingTitle{font-size:clamp(38px,6vw,74px);line-height:.96;letter-spacing:-3px;font-weight:950;margin-top:12px}.landingTitle span{display:block;color:var(--muted)}.landingLead{font-size:11px;line-height:1.8;color:var(--muted);max-width:650px;margin-top:18px}.landingActions{display:flex;gap:9px;flex-wrap:wrap;margin-top:24px}.landingActions button{min-height:46px;padding:0 18px;border-radius:14px;font-size:10px;font-weight:850;border:1px solid var(--line)}.landingPrimary{background:#171922;color:#fff}.landingSecondary{background:var(--card);color:var(--ink)}.landingCard{padding:20px;border:1px solid var(--line);background:rgba(255,255,255,.72);border-radius:26px;box-shadow:0 24px 70px rgba(23,25,34,.12);backdrop-filter:blur(20px)}.landingPreview{aspect-ratio:1/1;max-height:460px;display:grid;place-items:center;background:linear-gradient(145deg,#171922,#30333e);border-radius:22px;overflow:hidden;position:relative}.landingOrb{width:210px;height:210px;border-radius:42% 58% 55% 45%;background:#f4f5f7;box-shadow:22px 28px 0 rgba(255,255,255,.12),0 35px 65px rgba(0,0,0,.3);transform:rotate(-8deg)}.landingPreviewText{position:absolute;bottom:20px;left:20px;color:#fff}.landingPreviewText b{display:block;font-size:17px}.landingPreviewText span{font-size:8px;opacity:.72}.landingMiniGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.landingMini{padding:10px;border-radius:12px;background:var(--soft);font-size:8px}.landingMini b{display:block;font-size:10px;margin-bottom:3px}.landingMini span{color:var(--muted)}
+.themePage{display:grid;gap:16px}.themeHero{padding:22px;background:linear-gradient(135deg,#171922,#2a2d38);color:#fff;border-radius:22px;box-shadow:0 20px 50px rgba(23,25,34,.2)}.themeHero b{font-size:20px}.themeHero p{font-size:9px;line-height:1.6;opacity:.72;margin:7px 0 0}.themeModeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.themeMode{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:15px;padding:14px;text-align:left;min-height:92px}.themeMode.active{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 12%,transparent);background:var(--soft)}.themeMode b{font-size:10px;display:block}.themeMode span{font-size:8px;color:var(--muted);display:block;line-height:1.5;margin-top:5px}.themeControls{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.themeControl{padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--card)}.themeControl label{font-size:8px;font-weight:850;display:block;margin-bottom:8px}.themeControl input[type=color]{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;background:var(--soft);padding:4px}.themeControl select,.themeControl input[type=range]{width:100%}.themeControl select{height:40px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink);padding:0 10px;font-size:9px}.themeRange{display:flex;align-items:center;gap:10px}.themeRange input{flex:1}.themeRange output{min-width:38px;text-align:right;font-size:8px;color:var(--muted)}.themePreviewBox{padding:18px;border-radius:18px;background:var(--soft);border:1px solid var(--line)}.themePreviewDemo{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:var(--custom-radius);background:var(--card);box-shadow:0 12px 28px var(--custom-shadow)}.themePreviewDemo div{font-size:9px}.themePreviewDemo b{display:block;font-size:12px}.themePreviewDemo span{font-size:8px;color:var(--muted)}.themePreviewDemo button{border:0;background:var(--accent);color:var(--accent-contrast);border-radius:12px;padding:10px 14px;font-size:8px;font-weight:850}
+@media(max-width:800px){.landingWrap{grid-template-columns:1fr}.landingCard{order:-1}.landingPreview{max-height:310px}.themeModeGrid,.themeControls{grid-template-columns:1fr}.side{width:min(300px,88vw)}}
+@media(min-width:901px){.side.open~.main{filter:none}.main{margin-left:0!important;width:100%!important;max-width:none!important}}
+</style>
+<style id="v1-5-11-polish">
+.landingWrap{animation:landingRise .55s cubic-bezier(.2,.75,.2,1) both}.landingCard{animation:landingFloat .9s ease .08s both}.landingActions button{transition:transform .18s ease,box-shadow .18s ease}.landingActions button:hover{transform:translateY(-2px)}
+@media(prefers-reduced-motion:reduce){.landingWrap,.landingCard{animation:none!important}.landingActions button{transition:none!important}}
+@keyframes landingRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes landingFloat{from{opacity:0;transform:translateY(20px) scale(.98)}to{opacity:1;transform:none}}
+.presetGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.presetBtn{min-height:88px;text-align:left;padding:13px;border:1px solid var(--line);border-radius:16px;background:var(--soft);color:var(--ink);cursor:pointer;transition:.18s}.presetBtn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.08)}.presetBtn b{display:block;font-size:10px}.presetBtn span{display:block;color:var(--muted);font-size:8px;line-height:1.5;margin-top:5px}
+.themeFullPreview{overflow:hidden}.themePreviewChrome{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--bg);min-height:250px}.themePreviewMiniTop{height:32px;display:flex;align-items:center;gap:5px;padding:0 12px;border-bottom:1px solid var(--line)}.themePreviewMiniTop span{width:90px;height:7px;border-radius:99px;background:var(--soft)}.themePreviewMiniTop i{width:6px;height:6px;border-radius:50%;background:var(--muted);opacity:.35}.themePreviewMiniBody{padding:18px;display:grid;grid-template-columns:1.5fr 1fr;gap:12px}.themePreviewMiniCard{padding:18px;border-radius:var(--custom-radius,18px);background:var(--card);box-shadow:0 var(--custom-depth,10px) 0 var(--custom-shadow,#171922)}.themePreviewMiniCard b{display:block;font-size:15px}.themePreviewMiniCard span{display:block;font-size:8px;color:var(--muted);margin:5px 0 15px}.themePreviewMiniCard button{border:0;border-radius:12px;padding:9px 12px;background:var(--accent,#171922);color:var(--accent-contrast,#fff);font-size:8px;font-weight:800}.themePreviewMiniCard button.ghost{margin-left:5px;background:var(--soft);color:var(--ink)}.themePreviewMiniStats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.themePreviewMiniStats span{display:block;min-height:58px;border-radius:14px;background:var(--soft)}.themePreviewMiniNav{display:flex;justify-content:space-around;padding:12px;border-top:1px solid var(--line);font-size:7px;color:var(--muted)}.themePreviewMiniNav strong{background:var(--accent,#171922);color:var(--accent-contrast,#fff);padding:7px 11px;border-radius:99px}
+.widgetSettingGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.widgetToggle{display:flex;justify-content:space-between;align-items:center;padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--soft);cursor:pointer}.widgetToggle b{display:block;font-size:10px}.widgetToggle small{display:block;color:var(--muted);font-size:8px;margin-top:3px}.widgetToggle input{width:18px;height:18px;accent-color:var(--accent,#171922)}.notificationList{display:grid;gap:8px}.notificationItem{display:flex;gap:11px;padding:13px;border:1px solid var(--line);border-radius:14px;background:var(--soft)}.notificationItem b{font-size:10px}.notificationItem p{font-size:9px;color:var(--muted);margin:4px 0}.notificationItem small{font-size:7px;color:var(--muted)}.notificationDot{width:8px;height:8px;border-radius:50%;background:var(--accent,#171922);margin-top:4px;flex:none}.notificationEmpty{padding:28px;text-align:center;color:var(--muted);font-size:9px}.notifBadge{position:absolute;top:3px;right:3px;min-width:14px;height:14px;padding:0 3px;border-radius:99px;background:#171922;color:#fff;font-size:7px;display:grid;place-items:center;font-weight:800}.topbtn{position:relative}
+@media(max-width:800px){.presetGrid{grid-template-columns:1fr 1fr}.widgetSettingGrid{grid-template-columns:1fr}.themePreviewMiniBody{grid-template-columns:1fr}.themePreviewMiniStats{display:none}}
+</style>
 </head>
-<body>
+<body class="landingMode">
 <div class="layout">
-<aside class="side" id="side">
-  <div class="brand"><div class="brandmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M9 18h6"/></svg></div><div><b>WEB TO APK</b><small>STUDIO · V1.4</small></div></div>
-  <div class="navlabel">Information</div>
+<aside class="side" id="side"><button class="sideClose" onclick="toggleSide()" title="Close navigation">×</button>
+  <div class="brand"><div class="brandmark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M9 18h6"/></svg></div><div><b>WEB TO APK</b><small>STUDIO · V1.5.12</small></div></div>
+  <div class="navlabel">Navigation</div>
   <div class="nav">
-    <button class="active" onclick="page('engine',this)">About</button>
+    <button class="active" onclick="page('dashboard',this)">Dashboard</button>
+    <button onclick="page('builder',this)">Build Apps</button>
+    <button onclick="page('history',this)">Build History</button>
+    <button onclick="page('studio',this)">Studio</button>
+    <button onclick="page('engine',this)">About</button>
+    <button onclick="page('theme',this)">Theme Studio</button>
   </div>
+  <div class="sideTheme"><button class="sideThemeBtn" onclick="page('theme',this);toggleSide()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3a9 9 0 1 0 9 9c0-1.1-.9-2-2-2h-2a2 2 0 0 1-2-2V6a3 3 0 0 0-3-3Z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7.5" r="1"/><circle cx="14" cy="7.5" r="1"/></svg><div>Customize Website Theme<small>Dark / White · Custom · 3D Cartoon</small></div></button></div>
   <div class="sidefoot"><span class="live"></span>Build service Connected · Ready Build</div>
 </aside>
+<div class="sideOverlay" id="sideOverlay" onclick="toggleSide()"></div>
 
 <main class="main">
 <div class="top">
-  <div style="display:flex;align-items:center;gap:10px"><button class="topbtn mobile" onclick="toggleSide()">⾕</button><div><div class="title" id="title">WebToApps</div><div class="sub" id="sub">Build Sebuah Website/File Html Menjadi Aplikasi Yang Siap Digunakan.</div></div></div>
-  <div style="display:flex;gap:8px"><button class="topbtn" id="notifyBtn" onclick="requestNotify()">⚲</button><button class="topbtn" onclick="openCommandPalette()" title="Command Palette">⌘</button><button class="topbtn" id="themeBtn" onclick="toggleTheme()">ᢉ𐭩</button><button class="topbtn" onclick="location.reload()">↻</button></div>
+  <div style="display:flex;align-items:center;gap:10px"><button class="topbtn menuTop" onclick="toggleSide()" title="Open navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><div><div class="title" id="title">WebToApps</div><div class="sub" id="sub">Build Sebuah Website/File Html Menjadi Aplikasi Yang Siap Digunakan.</div></div></div>
+  <div class="topTools"><button class="topbtn" id="notifyBtn" onclick="requestNotify()" title="Notifications"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button><button class="topbtn" id="notificationCenterBtn" onclick="openNotificationCenter()" title="Notification Center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span id="notificationBadge" class="notifBadge" hidden>0</span></button><button class="topbtn" onclick="openCommandPalette()" title="Command Palette"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4M8.5 11h5"/></svg></button><button class="topbtn" id="themeBtn" onclick="toggleTheme()" title="Dark / Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button><button class="topbtn" onclick="location.reload()" title="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8 8 0 1 0 2 5"/><path d="M20 4v7h-7"/></svg></button></div>
 </div>
 
-<div class="topnav" id="topnav">
-  <button class="active" onclick="page('dashboard',this)">Home</button>
-  <button onclick="page('builder',this)">Build Apps</button>
-  <button onclick="page('history',this)">Build History</button>
-  <button onclick="page('studio',this)">Studio</button>
+<div class="topnav" id="topnav" aria-label="Main navigation">
+  <button class="active" onclick="page('dashboard',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5M9.5 21v-6h5v6"/></svg><span>Home</span></button>
+  <button onclick="page('history',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="18" cy="18" r="3"/></svg><span>History</span></button>
+  <button class="navBuild" onclick="page('builder',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 7h6M9 11h6M9 15h3"/></svg><span>Build Apps</span></button>
+  <button onclick="page('studio',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m14 6 4 4M7 17l9-9 3 3-9 9-4 1 1-4Z"/><path d="M4 5h5M4 9h3M4 13h3"/></svg><span>Studio</span></button>
+  <button onclick="page('engine',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4l2.5 2.5"/></svg><span>About</span></button>
 </div>
 
 <div id="notice" class="notice info"></div>
 
-<section class="page active" id="dashboard">
-  <div class="stats">
-    <div class="card stat"><span>Total Builds</span><b id="sTotal">0</b><em>Projects</em></div>
-    <div class="card stat"><span>Successful</span><b id="sSuccess">0</b><em>Ready</em></div>
-    <div class="card stat"><span>Failed</span><b id="sFailed">0</b><em>Tracked</em></div>
-    <div class="card stat"><span>Quick Edit</span><b id="sQuick">0/2</b><em>Today</em></div>
+<section class="page active" id="landing">
+  <div class="landingWrap">
+    <div>
+      <div class="landingEyebrow">WEB TO APK STUDIO · WELCOME</div>
+      <div class="landingTitle">Turn your<br><span>web into an app.</span></div>
+      <div class="landingLead">Selamat datang di WebToApkStudio. Bangun aplikasi Android dari website atau satu file HTML, atur identitas dan tampilannya, lihat Final Preview, lalu jalankan proses build dengan workflow yang terstruktur.</div>
+      <div class="landingActions"><button class="landingPrimary" onclick="enterDashboard()">OPEN DASHBOARD</button><button class="landingSecondary" onclick="enterBuilder()">START BUILD</button><button class="landingSecondary" onclick="enterTheme()">CUSTOMIZE THEME</button></div>
+      <div class="landingMiniGrid"><div class="landingMini"><b>01 · Build</b><span>Source URL atau single HTML.</span></div><div class="landingMini"><b>02 · Customize</b><span>Icon, splash, fullscreen, permission.</span></div><div class="landingMini"><b>03 · Preview</b><span>Periksa konfigurasi sebelum build.</span></div><div class="landingMini"><b>04 · APK</b><span>Real Android build dari engine.</span></div></div>
+    </div>
+    <div class="landingCard"><div class="landingPreview"><div class="landingOrb"></div><div class="landingPreviewText"><b>WebToApkStudio</b><span>Professional Web → Android workflow</span></div></div></div>
   </div>
-  <div class="grid">
-    <div class="card cardpad">
-      <div class="head"><div><div class="ctitle">Web to APK Studio</div><div class="desc">Bangun APK dari URL atau kirim satu file HTML. Preview sudah dibuat seperti perangkat Android.</div></div><span class="pill">V1.5.6</span></div>
-      <div class="helper"><b>Workflow baru:</b> pilih URL atau HTML → lihat phone preview → atur nama, icon, fullscreen → BUILD. Quick Edit hanya muncul untuk build yang sudah sukses dan dibatasi 2 kali per hari.</div>
-      <div class="infoGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px">
-        <div class="helper"><b>Developer</b><br>@Keiraalqx</div>
-        <div class="helper"><b>Engine</b><br>Android WebView + Gradle 8.13</div>
-        <div class="helper"><b>Source</b><br>Website URL / Single HTML</div>
-        <div class="helper"><b>Safety</b><br>Download hanya aktif setelah APK valid</div>
-      </div>
-      <div class="actions"><button class="secondary" onclick="goBuilder()">Open APK Builder</button><button class="secondary" onclick="page('history',document.querySelectorAll('#topnav button')[2])">Build History</button><button class="secondary" onclick="page('studio',document.querySelectorAll('#topnav button')[3])">Studio Center</button></div>
-    </div>
-    <div class="card preview">
-      <div class="previewtop"><div><div class="ctitle">App Preview</div><div class="desc">Tampilan simulasi perangkat Android sebelum build.</div></div><div class="previewtools"><span class="pill" id="dashPreviewState">WAITING</span></div></div>
-      <div class="previewbody">
-        <div>
-          <div class="phone"><div class="phoneScreen" id="dashPhone"><div class="empty"><div><strong>Belum ada source</strong>Buka APK Builder untuk memuat URL atau file HTML.</div></div></div><div class="phoneBar"><span>9:41</span><span>● ● ●</span></div></div>
-          <div class="previewNote">Preview adalah simulasi visual WebView. Sebagian website dapat membatasi pemuatan di iframe.</div>
-        </div>
-      </div>
-    </div>
+</section>
+
+<section class="page" id="dashboard">
+  <div class="dashboardShell">
+    <div class="dashboardHeader"><div><div class="dashboardEyebrow">WEB TO APK STUDIO · CONTROL CENTER</div><div class="dashboardHeading">Build. Preview. Deploy.</div><div class="dashboardLead">Satu tempat untuk mengubah website atau satu file HTML menjadi aplikasi Android, mengatur tampilan, memeriksa konfigurasi, memantau build, dan mengelola APK hasil produksi.</div></div><div class="dashLive"><i></i>Build Service Connected</div></div>
+    <div class="bannerCard" id="dashboardBanner"><img id="bannerImage" src="https://files.catbox.moe/9x86mp.jpg" alt="WebToApkStudio banner"><div class="bannerFallbackOverlay" id="bannerFallback"><div><b>WebToApkStudio</b><span>Professional Android WebView Builder</span></div></div><div class="bannerOverlay"><div class="bannerCopy"><small>WEB APPLICATION → ANDROID</small><b>KennTaxx WebToApps</b><span>Builder, customization, final preview, dan real Android build dalam satu workflow.</span></div></div></div>
+    <div class="dashStats"><div class="card dashStat"><div class="dashStatHead"><span>BUILDS TODAY</span><div class="dashStatIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M9 7h6M9 11h6M9 15h3"/></svg></div></div><b id="sTotal">0</b><em>Aktivitas build hari ini</em></div><div class="card dashStat successStat"><div class="dashStatHead"><span>SUCCESS</span><div class="dashStatIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="m8 12 2.6 2.6L16.5 9"/></svg></div></div><b id="sSuccess">0</b><em>APK berhasil dibuat</em></div><div class="card dashStat failStat"><div class="dashStatHead"><span>FAILED</span><div class="dashStatIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="m9 9 6 6M15 9l-6 6"/></svg></div></div><b id="sFailed">0</b><em>Build yang gagal</em></div><div class="card dashStat"><div class="dashStatHead"><span>QUICK EDIT</span><div class="dashStatIcon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m14 5 5 5M7 17l9-9 3 3-9 9-4 1 1-4Z"/></svg></div></div><b id="sQuick">0/2</b><em>Kuota edit hari ini</em></div></div>
+    <div class="dashInfoGrid"><div class="card dashInfo"><div class="dashSectionTitle">Tentang WebToApkStudio</div><div class="dashSectionDesc">Platform builder berbasis web untuk menghasilkan aplikasi Android dari website URL maupun satu file HTML.</div><div class="dashArticle"><strong>WebToApkStudio</strong> dirancang dengan alur kerja yang sederhana tetapi tetap memberi kontrol pada bagian penting aplikasi. Kamu dapat menentukan sumber website, nama aplikasi, versi, package, icon, fullscreen, orientation, splash screen, permission, reload behavior, sampai Offline Mode. Sebelum proses Android benar-benar dimulai, konfigurasi dapat diperiksa dan ditampilkan kembali pada <strong>Final App Preview</strong> sehingga perubahan tidak langsung dilempar ke proses build tanpa pengecekan.<br><br>Untuk project URL, APK menggunakan URL asli yang kamu masukkan. Untuk project satu file HTML, source dipasang sebagai asset aplikasi. Offline Mode bekerja sebagai <strong>static snapshot</strong>: resource yang berhasil dipaketkan tersedia secara lokal, sedangkan layanan online seperti API, database cloud, login server, dan WebSocket tetap membutuhkan koneksi atau implementasi lokal yang sesuai.<br><br>Build yang selesai dapat dilacak melalui History, dianalisis, diunduh, dibagikan melalui Android Share Sheet, atau dibuka kembali melalui Quick Edit.</div></div><div class="card dashInfo"><div class="dashSectionTitle">Project Information</div><div class="dashSectionDesc">Informasi utama engine dan aplikasi Studio.</div><div class="dashMeta"><div class="dashMetaItem"><span>Developer</span><b>@Keiraalqx</b></div><div class="dashMetaItem"><span>Version</span><b>V1.5.12</b></div><div class="dashMetaItem"><span>Engine</span><b>Android WebView + Gradle</b></div><div class="dashMetaItem"><span>Platform</span><b>Android</b></div><div class="dashMetaItem"><span>Source</span><b>Website URL / Single HTML</b></div><div class="dashMetaItem"><span>Storage</span><b>Browser IndexedDB</b></div></div></div></div>
+    <div class="dashBottom"><div class="card dashInfo"><div class="dashSectionTitle">Quick Edit</div><div class="dashSectionDesc">Akses cepat untuk build sukses yang terakhir tersimpan.</div><div id="dashboardQuickList" class="quickPanel"></div></div><div class="card dashInfo"><div class="dashSectionTitle">Recent Activity</div><div class="dashSectionDesc">Ringkasan aktivitas build terbaru.</div><div id="dashboardActivity" class="dashList"></div></div></div>
   </div>
 </section>
 
@@ -168,6 +246,41 @@ body.dark .side{background:rgba(18,21,28,.88);border-color:var(--line)}body.dark
     </div>
     <div class="card preview finalPreviewCard"><div class="previewtop"><div><div class="ctitle">Android Runtime Preview</div><div class="desc">Source + splash + fullscreen + orientation.</div></div><span class="pill" id="finalPreviewMode">LIVE</span></div><div class="previewbody finalPreviewBody"><div><div class="phone" id="finalPhoneFrame"><div class="phoneScreen" id="step3Phone"><div class="empty"><div><strong>Ready</strong>Final preview akan dimuat.</div></div></div><div class="phoneBar" id="finalPhoneBar"><span>9:41</span><span>● ● ●</span></div></div><div class="previewNote" id="finalPreviewNote">Preview akhir memakai source yang sama dengan konfigurasi build. URL memakai preview proxy browser; APK memakai URL asli.</div></div></div></div>
   </div>
+</section>
+
+<section class="page" id="theme">
+  <div class="themePage">
+    <div class="themeHero"><b>Website Theme Studio</b><p>Atur tampilan WebToApkStudio tanpa mengubah engine build, konfigurasi APK, atau fungsi builder.</p></div>
+    <div class="card cardpad"><div class="head"><div><div class="ctitle">Choose your visual mode</div><div class="desc">Pilih tampilan original, atur warna area sendiri, atau gunakan gaya 3D Comic.</div></div><span class="pill" id="themeModeBadge">ORIGINAL</span></div>
+      <div class="themeModeGrid"><button class="themeMode active" id="themeOriginalBtn" onclick="setThemeMode('original')"><b>Original</b><span>Dark / White seperti tampilan bawaan WebToApkStudio.</span></button><button class="themeMode" id="themeCustomBtn" onclick="setThemeMode('custom')"><b>Custom</b><span>Atur background, tombol, accent, shadow, radius, dan model.</span></button><button class="themeMode" id="theme3dBtn" onclick="setThemeMode('3d')"><b>3D Comic</b><span>Komik 3D dengan depth tegas dan pilihan warna utama.</span></button></div>
+    </div>
+    <div class="card cardpad themePresetsCard"><div class="head"><div><div class="ctitle">Theme Presets</div><div class="desc">Preset siap pakai. Preview berubah sebelum tema diterapkan.</div></div><span class="pill">PRESETS</span></div><div class="presetGrid"><button class="presetBtn" onclick="applyThemePreset('midnight')"><b>Midnight Glass</b><span>Dark · glass · soft depth</span></button><button class="presetBtn" onclick="applyThemePreset('paper')"><b>Paper White</b><span>Light · clean · minimal</span></button><button class="presetBtn" onclick="applyThemePreset('neo')"><b>Neo 3D</b><span>Deep · bold · dimensional</span></button><button class="presetBtn" onclick="applyThemePreset('comic')"><b>3D Comic</b><span>Bold · comic · dimensional</span></button></div><div class="themePreviewBox themeFullPreview"><div class="themePreviewChrome"><div class="themePreviewMiniTop"><span></span><i></i><i></i><i></i></div><div class="themePreviewMiniBody"><div class="themePreviewMiniCard"><b>WebToApkStudio</b><span>Live interface preview</span><div><button>BUILD APPS</button><button class="ghost">STUDIO</button></div></div><div class="themePreviewMiniStats"><span></span><span></span><span></span></div></div><div class="themePreviewMiniNav"><b>HOME</b><b>HISTORY</b><strong>BUILD</strong><b>STUDIO</b><b>ABOUT</b></div></div></div></div>
+    <div class="card cardpad" id="themeCustomPanel"><div class="head"><div><div class="ctitle">Custom Appearance</div><div class="desc">Perubahan diterapkan langsung ke seluruh interface website dan disimpan di perangkat ini.</div></div></div>
+      <div class="themeControls">
+        <div class="themeControl"><label>PAGE BACKGROUND</label><input id="themeBgColor" type="color" value="#f5f6fa" oninput="applyCustomTheme()"></div>
+        <div class="themeControl"><label>CARD / BOX COLOR</label><input id="themeCardColor" type="color" value="#ffffff" oninput="applyCustomTheme()"></div>
+        <div class="themeControl"><label>HEADER / NAV COLOR</label><input id="themeSurfaceColor" type="color" value="#ffffff" oninput="applyCustomTheme()"></div>
+        <div class="themeControl"><label>BUTTON / ACCENT COLOR</label><input id="themeAccentColor" type="color" value="#171922" oninput="applyCustomTheme()"></div>
+        <div class="themeControl"><label>BUTTON TEXT COLOR</label><input id="themeTextColor" type="color" value="#ffffff" oninput="applyCustomTheme()"></div>
+        <div class="themeControl"><label>INPUT / SOFT AREA</label><input id="themeSoftColor" type="color" value="#f0f2f6" oninput="applyCustomTheme()"></div>
+        <div class="themeControl"><label>3D SHADOW COLOR</label><input id="themeShadowColor" type="color" value="#171922" oninput="applyCustomTheme()"></div>
+        <div class="themeControl"><label>INTERFACE MODEL</label><select id="themeModel" onchange="applyCustomTheme()"><option value="normal">Normal / Flat</option><option value="soft">Soft 3D</option></select></div>
+        <div class="themeControl comicOnlyControl"><label>3D COMIC COLOR</label><select id="themeComicPalette" onchange="applyComicTheme()"><option value="redblack">Red / Black</option><option value="blueblack">Blue / Black</option><option value="purpleblack">Purple / Black</option><option value="yellowblack">Yellow / Black</option></select></div>
+        <div class="themeControl"><label>CORNER RADIUS</label><div class="themeRange"><input id="themeRadius" type="range" min="10" max="32" value="18" oninput="applyCustomTheme()"><output id="themeRadiusOut">18px</output></div></div>
+        <div class="themeControl"><label>SHADOW DEPTH</label><div class="themeRange"><input id="themeShadowDepth" type="range" min="0" max="28" value="16" oninput="applyCustomTheme()"><output id="themeShadowOut">16px</output></div></div>
+      </div>
+      <div class="themePreviewBox" style="margin-top:12px"><div class="themePreviewDemo"><div><b>Live Theme Preview</b><span>Contoh tampilan tombol dan card.</span></div><button>BUILD APPS</button></div></div>
+      <div class="actions"><button class="secondary" onclick="resetCustomTheme()">RESET CUSTOM THEME</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="notifications">
+  <div class="card cardpad"><div class="head"><div><div class="ctitle">Notification Center</div><div class="desc">Ringkasan event penting dari Studio dan proses build.</div></div><button class="secondary" onclick="clearNotifications()">CLEAR</button></div><div id="notificationList" class="notificationList"></div></div>
+</section>
+
+<section class="page" id="dashboardWidgets">
+  <div class="card cardpad"><div class="head"><div><div class="ctitle">Dashboard Widget System</div><div class="desc">Pilih informasi yang ingin tampil di Dashboard. Pengaturan hanya memengaruhi tampilan.</div></div><span class="pill">WIDGETS</span></div><div class="widgetSettingGrid"><label class="widgetToggle"><span><b>Build Statistics</b><small>Total, success, failed</small></span><input type="checkbox" id="widgetStats" checked onchange="toggleDashboardWidget('stats',this.checked)"></label><label class="widgetToggle"><span><b>Project Information</b><small>Developer, version, engine</small></span><input type="checkbox" id="widgetInfo" checked onchange="toggleDashboardWidget('info',this.checked)"></label><label class="widgetToggle"><span><b>Recent Activity</b><small>Aktivitas build terbaru</small></span><input type="checkbox" id="widgetActivity" checked onchange="toggleDashboardWidget('activity',this.checked)"></label><label class="widgetToggle"><span><b>Quick Edit</b><small>Edit build terakhir</small></span><input type="checkbox" id="widgetQuick" checked onchange="toggleDashboardWidget('quick',this.checked)"></label></div></div>
 </section>
 
 <section class="page" id="history">
@@ -272,6 +385,7 @@ function todayKey(){return new Date().toISOString().slice(0,10)}
 function quickUsed(){return Number(localStorage.getItem('wta-quick-'+todayKey())||0)}
 function setQuickUsed(n){localStorage.setItem('wta-quick-'+todayKey(),String(n))}
 function notifyText(title,body){
+  try{pushNotification(title,body,title==='Build berhasil'?'ok':'info')}catch{}
   showToast(body,title==='Build berhasil'?'ok':'info');
   if('Notification' in window && Notification.permission==='granted'){try{new Notification(title,{body,icon:'/font/twin.ttf'})}catch{}}
 }
@@ -281,10 +395,65 @@ function showPopup(title,msg,kind='info',details='',buttons=null){return new Pro
 function showToast(msg,kind='info'){showPopup(kind==='ok'?'Success':kind==='error'?'Error':kind==='warn'?'Warning':'Notice',msg,kind)}
 function showNotice(msg,kind='info'){showPopup(kind==='ok'?'Success':kind==='error'?'Error':kind==='warn'?'Warning':'Notice',msg,kind)}
 function requestNotify(){if(!('Notification' in window)){showNotice('Browser ini tidak mendukung notifikasi web.','warn');return}Notification.requestPermission().then(p=>{if(p==='granted'){notifyText('Notifikasi aktif','Status build akan dikirim sebagai notifikasi saat halaman masih aktif.')}else showNotice('Izin notifikasi belum diberikan. Status build tetap akan terlihat di halaman.','warn')})}
-function page(id,btn){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');document.querySelectorAll('.nav button,.topnav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');$('title').textContent=btn?btn.textContent.trim():({dashboard:'Dashboard',builder:'APK Builder',history:'Build History',engine:'About',studio:'Studio'}[id]||'Web to APK');$('sub').textContent=id==='engine'?'Build environment, engine and project information':'Build Android WebView applications from a website URL or one HTML file';if(id==='history')renderHistory();updateStats();if(innerWidth<901)$('side').classList.remove('open')}
-function toggleSide(){$('side').classList.toggle('open')}
-function goBuilder(){page('builder',document.querySelectorAll('#topnav button')[1])}
-function toggleTheme(){const dark=!document.body.classList.contains('dark');document.body.classList.toggle('dark',dark);localStorage.setItem('wta-theme',dark?'dark':'light')}
+function page(id,btn){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  const target=$(id);if(!target)return;target.classList.add('active');
+  document.querySelectorAll('.nav button,.topnav button,.sideThemeBtn').forEach(x=>x.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  const map={landing:'Welcome',dashboard:'Dashboard',builder:'APK Builder',history:'Build History',engine:'About',studio:'Studio',theme:'Theme Studio',notifications:'Notification Center',dashboardWidgets:'Dashboard Widgets'};
+  $('title').textContent=map[id]||'Web to APK';
+  $('sub').textContent=id==='dashboard'?'Professional Web to APK control center':id==='theme'?'Customize the WebToApkStudio interface':'Build Android WebView applications from a website URL or one HTML file';
+  document.querySelectorAll('.topnav button,.nav button').forEach(x=>{const oc=x.getAttribute('onclick')||'';if(oc.includes("page('"+id+"'"))x.classList.add('active')});
+  if(id==='history')renderHistory();if(id==='dashboard')renderDashboardExtras();
+  if(id==='landing'){document.body.classList.add('landingMode');$('side').classList.remove('open');$('sideOverlay').classList.remove('show')}else{document.body.classList.remove('landingMode')}
+  $('side')?.classList.toggle('open',false);$('sideOverlay')?.classList.toggle('show',false);
+}
+
+function toggleSide(){const side=$('side'),ov=$('sideOverlay');side.classList.toggle('open');ov.classList.toggle('show',side.classList.contains('open'))}
+function goBuilder(){page('builder',document.querySelectorAll('#topnav button')[2])}
+function enterDashboard(){document.querySelector('.main')?.scrollTo?.(0,0);page('dashboard',document.querySelector("#topnav button"))}
+function enterBuilder(){document.querySelector('.main')?.scrollTo?.(0,0);page('builder',document.querySelectorAll('#topnav button')[2])}
+function enterTheme(){localStorage.setItem('wta-landing-seen','1');page('theme',document.querySelector(".nav button[onclick*=\"page('theme'\")]"))}
+function hexToRgba(hex,a){const h=String(hex||'').replace('#','');const n=parseInt(h,16);if(Number.isNaN(n))return `rgba(23,25,34,${a})`;return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`}
+function setThemeMode(mode){
+  document.body.classList.remove('theme-custom','theme-3d','theme-comic','theme-cartoon');
+  document.querySelectorAll('.themeMode').forEach(x=>x.classList.remove('active'));
+  const b=mode==='original'?'themeOriginalBtn':mode==='custom'?'themeCustomBtn':'theme3dBtn';$(b)?.classList.add('active');
+  $('themeModeBadge').textContent=mode==='original'?'ORIGINAL':mode==='custom'?'CUSTOM':'3D COMIC';
+  if(mode==='original'){
+    localStorage.setItem('wta-ui-theme-mode','original');localStorage.removeItem('wta-custom-theme');
+    ['--custom-bg','--custom-card','--custom-surface','--custom-soft','--accent','--accent-contrast','--custom-shadow','--custom-radius'].forEach(v=>document.documentElement.style.removeProperty(v));
+    loadTheme();return;
+  }
+  if(mode==='3d'){
+    document.body.classList.add('theme-custom','theme-3d','theme-comic');
+    applyComicTheme();return;
+  }
+  document.body.classList.add('theme-custom');applyCustomTheme();
+}
+function applyComicTheme(){
+  const palette=$('themeComicPalette')?.value||'redblack';
+  const palettes={redblack:['#f4f4f5','#151515','#ffffff','#e33b42','#151515'],blueblack:['#eef4ff','#111827','#ffffff','#2563eb','#111827'],purpleblack:['#f5f0ff','#171126','#ffffff','#7c3aed','#171126'],yellowblack:['#fff9df','#161616','#ffffff','#e0a800','#161616']};
+  const [bg,card,text,accent,shadow]=palettes[palette]||palettes.redblack;
+  document.body.classList.add('theme-custom','theme-3d','theme-comic');document.body.classList.remove('theme-cartoon');
+  document.documentElement.style.setProperty('--custom-bg',bg);document.documentElement.style.setProperty('--custom-card',card);document.documentElement.style.setProperty('--custom-surface',card);document.documentElement.style.setProperty('--custom-soft',bg);document.documentElement.style.setProperty('--accent',accent);document.documentElement.style.setProperty('--accent-contrast',text);document.documentElement.style.setProperty('--custom-shadow',hexToRgba(shadow,.42));document.documentElement.style.setProperty('--custom-radius','22px');
+  localStorage.setItem('wta-ui-theme-mode','3d');localStorage.setItem('wta-custom-theme',JSON.stringify({comic:true,palette,bg,card,surface:card,soft:bg,accent,text,shadow,radius:22,depth:20,model:'comic'}));
+}
+function applyCustomTheme(){
+  const bg=$('themeBgColor')?.value||'#f5f6fa',card=$('themeCardColor')?.value||'#ffffff',surface=$('themeSurfaceColor')?.value||card,soft=$('themeSoftColor')?.value||'#f0f2f6',accent=$('themeAccentColor')?.value||'#171922',text=$('themeTextColor')?.value||'#ffffff',shadow=$('themeShadowColor')?.value||'#171922',radius=Number($('themeRadius')?.value||18),depth=Number($('themeShadowDepth')?.value||16),model=$('themeModel')?.value||'normal';
+  document.body.classList.add('theme-custom');document.body.classList.toggle('theme-3d',model==='soft');document.body.classList.remove('theme-comic','theme-cartoon');
+  document.documentElement.style.setProperty('--custom-bg',bg);document.documentElement.style.setProperty('--custom-card',card);document.documentElement.style.setProperty('--custom-surface',surface);document.documentElement.style.setProperty('--custom-soft',soft);document.documentElement.style.setProperty('--accent',accent);document.documentElement.style.setProperty('--accent-contrast',text);document.documentElement.style.setProperty('--custom-shadow',hexToRgba(shadow,Math.min(.45,.12+depth/80)));document.documentElement.style.setProperty('--custom-radius',radius+'px');
+  $('themeRadiusOut').textContent=radius+'px';$('themeShadowOut').textContent=depth+'px';localStorage.setItem('wta-ui-theme-mode','custom');localStorage.setItem('wta-custom-theme',JSON.stringify({bg,card,surface,soft,accent,text,shadow,radius,depth,model}));
+}
+function resetCustomTheme(){localStorage.removeItem('wta-custom-theme');setThemeMode('original')}
+function loadWebsiteTheme(){
+  const mode=localStorage.getItem('wta-ui-theme-mode')||'original';const saved=JSON.parse(localStorage.getItem('wta-custom-theme')||'null');
+  if(saved){
+    if($('themeBgColor'))$('themeBgColor').value=saved.bg||'#f5f6fa';if($('themeCardColor'))$('themeCardColor').value=saved.card||'#ffffff';if($('themeSurfaceColor'))$('themeSurfaceColor').value=saved.surface||saved.card||'#ffffff';if($('themeSoftColor'))$('themeSoftColor').value=saved.soft||'#f0f2f6';if($('themeAccentColor'))$('themeAccentColor').value=saved.accent||'#171922';if($('themeTextColor'))$('themeTextColor').value=saved.text||'#ffffff';if($('themeShadowColor'))$('themeShadowColor').value=saved.shadow||'#171922';if($('themeRadius'))$('themeRadius').value=saved.radius||18;if($('themeShadowDepth'))$('themeShadowDepth').value=saved.depth||16;
+  }
+  if(mode==='original')setThemeMode('original');else if(mode==='3d'){if($('themeComicPalette'))$('themeComicPalette').value=saved?.palette||'redblack';setThemeMode('3d')}else setThemeMode('custom');
+}
+function toggleTheme(){const mode=localStorage.getItem('wta-ui-theme-mode')||'original';if(mode!=='original'){showNotice('Dark / White tersedia dari mode Original.','info');return}const dark=!document.body.classList.contains('dark');document.body.classList.toggle('dark',dark);localStorage.setItem('wta-theme',dark?'dark':'light')}
 function loadTheme(){document.body.classList.toggle('dark',localStorage.getItem('wta-theme')==='dark')}
 function setSource(type){
   if(state.building)return;
@@ -493,7 +662,7 @@ function exportProjects(){const clean=(state.records||[]).map(x=>{const y={...x}
 async function importProjects(input){const f=input.files?.[0];if(!f)return;try{const arr=JSON.parse(await f.text());if(!Array.isArray(arr))throw new Error('Format JSON tidak valid');for(const x of arr){if(x&&x.id&&x.name)await dbPut({...x,apkBlob:null});}state.records=await dbAll();renderHistory();updateStats();showNotice('Project history berhasil diimport.','ok')}catch(e){showNotice('Import gagal: '+e.message,'error')}finally{input.value=''}}
 function openCommandPalette(){ $('cmdOverlay').classList.add('show');$('cmdInput').value='';renderCommands();setTimeout(()=>$('cmdInput').focus(),30)}
 function hideCommandPalette(){ $('cmdOverlay').classList.remove('show')}
-function commandItems(){return [['Build Application','goBuilder()'],['Build History',"page('history',document.querySelectorAll('#topnav button')[2])"],['Home',"page('dashboard',document.querySelectorAll('#topnav button')[0])"],['About',"page('engine',document.querySelector('.nav button'))"],['Toggle Theme','toggleTheme()'],['Export Projects','exportProjects()'],['Clear History','clearHistory()']]}
+function commandItems(){return [['Build Application','goBuilder()'],['Build History',"page('history',document.querySelectorAll('#topnav button')[1])"],['Home',"page('dashboard',document.querySelectorAll('#topnav button')[0])"],['Theme Studio','enterTheme()'],['About',"page('engine',document.querySelector('.nav button'))"],['Toggle Theme','toggleTheme()'],['Export Projects','exportProjects()'],['Clear History','clearHistory()']]}
 function renderCommands(){const q=($('cmdInput').value||'').toLowerCase();const a=commandItems().filter(x=>x[0].toLowerCase().includes(q));$('cmdList').innerHTML=a.map((x,i)=>'<button class="cmdItem" data-cmd="'+i+'" onclick="runCommand('+i+')">'+esc(x[0])+'</button>').join('')||'<div class="emptyrow">No command found.</div>'}
 function runCommand(i){const x=commandItems()[i];if(!x)return;hideCommandPalette();try{new Function(x[1])()}catch(e){showNotice('Command gagal: '+e.message,'error')}}
 function commandKey(e){if(e.key==='Escape')hideCommandPalette();if(e.key==='Enter'){const first=document.querySelector('.cmdItem');if(first)first.click()}}
@@ -501,7 +670,11 @@ function saveBuilderDraft(){if(state.building)return;const d={name:$('bname').va
 function loadBuilderDraft(){try{const d=JSON.parse(localStorage.getItem('wta-draft-v15')||'null');if(!d)return;state.offlineMode=!!d.offlineMode;state.customize=!!d.customize||state.offlineMode;$('bname').value=d.name||$('bname').value;$('bversion').value=d.version||$('bversion').value;$('bpkg').value=d.pkg||$('bpkg').value;$('burl').value=d.url||'';if(d.orientation)$('borientation').value=d.orientation;if(d.reloadMode)$('breload').value=d.reloadMode;if($('offlineEnabled'))$('offlineEnabled').checked=!!d.offlineMode;if($('customizeEnabled'))$('customizeEnabled').checked=state.customize;if($('customPanel'))$('customPanel').classList.toggle('show',state.customize);if($('buildNotes'))$('buildNotes').value=d.buildNotes||'';}catch{}}
 function updateEnv(){fetch('/health').then(r=>r.json()).then(x=>{$('envNode').textContent=x.node||'Node.js';$('envSdk').textContent=x.sdk||'/opt/android-sdk';$('envGradle').textContent=x.gradle||'Android Gradle Plugin'}).catch(()=>{$('envNode').textContent='Server unavailable'})}
 async function clearHistory(){if(state.building){showNotice('Jangan clear history ketika build sedang berlangsung.','warn');return}const ok=await showPopup('Clear Build History','Semua riwayat build di browser ini akan dihapus. Tindakan ini tidak dapat dibatalkan.','warn','',[{label:'Cancel',value:false,cls:'popupSecondary'},{label:'Clear History',value:true,cls:'popupDanger'}]);if(!ok)return;await dbDeleteAll();state.records=[];updateStats();renderHistory();showNotice('Build history berhasil dihapus.','ok')}
-function updateStats(){const h=state.records||[];$('sTotal').textContent=h.length;$('sSuccess').textContent=h.filter(x=>x.status==='Success').length;$('sFailed').textContent=h.filter(x=>x.status==='Failed').length;$('sQuick').textContent=quickUsed()+'/2'}
+const DASHBOARD_BANNER_URL='https://files.catbox.moe/9x86mp.jpg';
+function dashboardBannerUrl(){return DASHBOARD_BANNER_URL}
+function loadDashboardBanner(){const img=$('bannerImage'),fallback=$('bannerFallback');if(!img||!fallback)return;img.src=DASHBOARD_BANNER_URL;img.onload=()=>{img.style.display='block';fallback.style.display='none'};img.onerror=()=>{img.style.display='none';fallback.style.display='grid'}}
+function renderDashboardExtras(){const h=state.records||[],q=$('dashboardQuickList'),a=$('dashboardActivity');if(!q||!a)return;const success=h.filter(x=>x.status==='Success').slice(0,3);q.innerHTML=success.length?success.map(x=>'<div class="quickEditItem"><div><b>'+esc(x.name)+'</b><span>'+esc(x.version||'1.0')+' · '+esc(x.dateText||'Build sukses')+'</span></div><button onclick="quickEdit(\''+x.id+'\')">EDIT</button></div>').join(''):'<div class="quickEditItem"><div><b>Belum ada build sukses</b><span>Build yang sukses akan muncul di sini.</span></div></div>';const recent=h.slice(0,5);a.innerHTML=recent.length?recent.map(x=>'<div class="dashListItem"><span><b>'+esc(x.name)+'</b><br><small>'+esc(x.version||'1.0')+' · '+esc(x.status)+'</small></span><small>'+esc(x.dateText||'—')+'</small></div>').join(''):'<div class="dashListItem"><span>Belum ada aktivitas build.</span></div>'}
+function updateStats(){const h=state.records||[],key=todayKey(),today=h.filter(x=>{const d=new Date(x.date||0);return !Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===key});$('sTotal').textContent=today.length;$('sSuccess').textContent=today.filter(x=>x.status==='Success').length;$('sFailed').textContent=today.filter(x=>x.status==='Failed').length;$('sQuick').textContent=quickUsed()+'/2';renderDashboardExtras()}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 function bindInputPreview(){const el=$('burl');el.addEventListener('input',()=>{if(state.sourceType==='url')previewCurrent();state.inspected=false;state.finalPreviewReady=false;if(state.offlineMode){state.offlineMode=false;state.offlineReport=null;if($('offlineEnabled'))$('offlineEnabled').checked=false;showNotice('URL berubah. Offline Mode dimatikan dan harus diperiksa ulang.','warn')}renderFinalPreview();saveBuilderDraft()});['bname','bversion','bpkg','borientation','breload','buildNotes'].forEach(id=>{const e=$(id);if(e)e.addEventListener('input',()=>{state.finalPreviewReady=false;renderFinalPreview();saveBuilderDraft()})});['borientation','breload'].forEach(id=>{const e=$(id);if(e)e.addEventListener('change',()=>{state.finalPreviewReady=false;renderFinalPreview();saveBuilderDraft()})});}
 window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openCommandPalette()}if(e.key==='Escape'&&$('cmdOverlay').classList.contains('show'))hideCommandPalette()})
@@ -610,12 +783,83 @@ function showBuildNotes(){const h=(state.records||[]).filter(x=>x.buildNotes);sh
 function showEnvironmentInfo(){fetch('/health').then(r=>r.json()).then(x=>showStudioText('Build Environment','Environment yang dilaporkan server.',[['Engine',x.engine||'android-webview'],['Server Version',x.version||'—'],['Node.js',x.node||'—'],['Android SDK',x.sdk||'—'],['Gradle',x.gradle||'—']])).catch(e=>showNotice('Environment tidak dapat dibaca: '+e.message,'warn'))}
 function queueAfterBuildIfNeeded(){if(!state.building&&state.buildQueue.length)setTimeout(processBuildQueue,250)}
 
+
+/* V1.5.12 visual-only additions: theme presets, notification center, widgets, landing animation. */
+const THEME_PRESETS={
+ midnight:{mode:'custom',bg:'#0d1017',card:'#151a24',surface:'#111620',soft:'#141923',accent:'#f4f6fb',text:'#101218',shadow:'#000000',model:'soft',radius:20,depth:18},
+ paper:{mode:'custom',bg:'#f5f6fa',card:'#ffffff',surface:'#ffffff',soft:'#f0f2f6',accent:'#171922',text:'#ffffff',shadow:'#171922',model:'normal',radius:18,depth:12},
+ neo:{mode:'custom',bg:'#151821',card:'#1b2130',surface:'#171c27',soft:'#202635',accent:'#8ea7ff',text:'#ffffff',shadow:'#05070c',model:'soft',radius:22,depth:22},
+ cartoon:{mode:'3d',bg:'#f1f3f7',accent:'#171922',text:'#ffffff',shadow:'#171922',model:'cartoon',radius:24,depth:24}
+};
+function applyThemePreset(key){
+  const x=THEME_PRESETS[key];if(!x)return;
+  if(x.mode==='3d'){if($('themeComicPalette'))$('themeComicPalette').value=x.palette||'redblack';setThemeMode('3d');showToast('Preset tema diterapkan: 3D Comic','ok');return}
+  setThemeMode(x.mode);if($('themeBgColor'))$('themeBgColor').value=x.bg;if($('themeCardColor'))$('themeCardColor').value=x.card||'#ffffff';if($('themeSurfaceColor'))$('themeSurfaceColor').value=x.surface||x.card||'#ffffff';if($('themeSoftColor'))$('themeSoftColor').value=x.soft||x.bg||'#f0f2f6';if($('themeAccentColor'))$('themeAccentColor').value=x.accent;if($('themeTextColor'))$('themeTextColor').value=x.text;if($('themeShadowColor'))$('themeShadowColor').value=x.shadow;if($('themeModel'))$('themeModel').value=x.model;if($('themeRadius'))$('themeRadius').value=x.radius;if($('themeShadowDepth'))$('themeShadowDepth').value=x.depth;applyCustomTheme();showToast('Preset tema diterapkan: '+key,'ok')
+}
+function renderThemePreview(){const demo=document.querySelector('.themePreviewDemo');const mini=document.querySelector('.themePreviewChrome');if(!demo&&!mini)return;document.documentElement.style.setProperty('--preview-accent',getComputedStyle(document.documentElement).getPropertyValue('--accent')||'#171922')}
+const NOTIF_KEY='wta-notifications-v1';
+function readNotifications(){try{return JSON.parse(localStorage.getItem(NOTIF_KEY)||'[]')}catch{return[]}}
+function saveNotifications(a){localStorage.setItem(NOTIF_KEY,JSON.stringify(a.slice(0,40)));updateNotificationBadge();renderNotificationCenter()}
+function pushNotification(title,body,kind='info'){const a=readNotifications();a.unshift({id:Date.now()+Math.random(),title,body,kind,date:new Date().toLocaleString('id-ID')});saveNotifications(a)}
+function updateNotificationBadge(){const n=readNotifications().length;const b=$('notificationBadge');if(b){b.textContent=n>99?'99+':n;b.hidden=!n}}
+function renderNotificationCenter(){const el=$('notificationList');if(!el)return;const a=readNotifications();el.innerHTML=a.length?a.map(x=>`<div class="notificationItem"><span class="notificationDot ${esc(x.kind||'info')}"></span><div><b>${esc(x.title)}</b><p>${esc(x.body)}</p><small>${esc(x.date)}</small></div></div>`).join(''):'<div class="notificationEmpty">Belum ada notifikasi.</div>'}
+function openNotificationCenter(){renderNotificationCenter();page('notifications');}
+function clearNotifications(){saveNotifications([]);showToast('Notification Center dibersihkan.','ok')}
+function toggleDashboardWidget(type,on){localStorage.setItem('wta-widget-'+type,on?'1':'0');applyDashboardWidgets()}
+function applyDashboardWidgets(){const map={stats:'.dashStats',info:'.dashInfoGrid',activity:'.dashBottom .dashInfo:nth-child(2)',quick:'.dashBottom .dashInfo:nth-child(1)'};Object.entries(map).forEach(([k,sel])=>{document.querySelectorAll(sel).forEach(e=>e.style.display=localStorage.getItem('wta-widget-'+k)==='0'?'none':'')});['stats','info','activity','quick'].forEach(k=>{const el=$('widget'+k.charAt(0).toUpperCase()+k.slice(1));if(el)el.checked=localStorage.getItem('wta-widget-'+k)!=='0'})}
+function loadWidgetSettings(){applyDashboardWidgets();updateNotificationBadge();renderNotificationCenter()}
+
 async function boot(){
-  loadTheme();await initHistory();bindInputPreview();loadBuilderDraft();updateQuickQuota();updateEnv();updateIconStudio();setBarMode(true);setSplashMode('none');
+  loadTheme();loadWebsiteTheme();loadDashboardBanner();await initHistory();bindInputPreview();loadBuilderDraft();updateQuickQuota();updateEnv();updateIconStudio();setBarMode(true);setSplashMode('none');
   if('serviceWorker' in navigator){try{await navigator.serviceWorker.register('/sw.js')}catch{}}
-  previewCurrent();renderStudioQueue();
+  previewCurrent();renderStudioQueue();loadWidgetSettings();
+  page('landing');
 }
 boot();
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('buildConfirmOverlay').classList.contains('show'))resolveBuildConfirm(false);else if($('popupOverlay').classList.contains('show'))closePopup(false)}});
 </script>
+
+<style id="v1-5-10-ui-fixes">
+/* V1.5.12 stability pass: isolated landing + reliable drawer sidebar */
+html,body{overflow-x:hidden}
+body.landingMode{overflow:hidden}
+body.landingMode .top,
+body.landingMode #topnav,
+body.landingMode #notice{display:none!important}
+body.landingMode .main{margin:0!important;width:100%!important;max-width:none!important;padding:0!important}
+body.landingMode .page{display:none!important}
+body.landingMode #landing{display:flex!important}
+
+/* Sidebar: real drawer, never display:none, so close/open always works */
+.side{display:block!important;position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:min(310px,88vw)!important;margin:0!important;z-index:210!important;transform:translate3d(-105%,0,0)!important;transition:transform .28s cubic-bezier(.22,.8,.24,1),box-shadow .28s ease!important;box-shadow:18px 0 55px rgba(16,18,24,0)!important;will-change:transform;overflow:auto;overscroll-behavior:contain}
+.side.open{transform:translate3d(0,0,0)!important;box-shadow:18px 0 55px rgba(16,18,24,.18)!important}
+.sideOverlay{position:fixed!important;inset:0!important;z-index:200!important;display:block!important;background:rgba(9,11,16,.34)!important;opacity:0!important;visibility:hidden!important;pointer-events:none!important;transition:opacity .22s ease,visibility .22s ease!important}
+.sideOverlay.show{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+.sideClose{z-index:2!important;display:grid!important;place-items:center!important;font-size:18px!important;line-height:1!important}
+.menuTop{display:grid!important;place-items:center!important}
+body:not(.landingMode) .sideOverlay{display:block!important}
+
+/* Keep drawer visually coherent in every theme, including 3D Cartoon */
+body.theme-custom .side{background:color-mix(in srgb,var(--custom-bg) 92%,var(--accent))!important;border-color:color-mix(in srgb,var(--accent) 18%,#fff)!important}
+body.theme-3d .side{border-radius:0 28px 28px 0!important;box-shadow:22px 0 0 var(--custom-shadow),18px 0 55px rgba(0,0,0,.12)!important}
+body.theme-comic .side .nav button,
+body.theme-comic .sideThemeBtn{border-radius:calc(var(--custom-radius) + 2px)!important;box-shadow:0 6px 0 var(--custom-shadow)!important}
+body.theme-comic .side .nav button:active,
+body.theme-comic .sideThemeBtn:active{transform:translateY(3px)!important;box-shadow:0 3px 0 var(--custom-shadow)!important}
+body.theme-comic .sideClose{border-radius:50%!important;box-shadow:0 5px 0 var(--custom-shadow)!important}
+
+/* Landing is a separate first screen; dashboard chrome never leaks into it */
+#landing{min-height:100svh!important;width:100%!important}
+.landingWrap{padding-bottom:20px}
+@media(max-width:800px){#landing{padding:20px!important}.landingWrap{padding-bottom:10px}}
+
+/* Avoid the drawer covering content after returning from landing */
+body.landingMode .side{transform:translate3d(-105%,0,0)!important}
+body.landingMode .sideOverlay{display:none!important}
+</style>
+<script>
+/* V1.5.12: ensure the initial screen is always isolated before boot() runs. */
+(function(){try{document.body.classList.add('landingMode');document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));const l=document.getElementById('landing');if(l)l.classList.add('active');}catch(e){}})();
+</script>
+
 </body></html>
