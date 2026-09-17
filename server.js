@@ -275,7 +275,7 @@ public class SplashActivity extends Activity{private final android.os.Handler ha
   const pullBlock=reload==='pull'?`web.setOnTouchListener(new android.view.View.OnTouchListener(){public boolean onTouch(android.view.View v,android.view.MotionEvent e){if(e.getAction()==android.view.MotionEvent.ACTION_DOWN){downY=e.getY();moved=false;}else if(e.getAction()==android.view.MotionEvent.ACTION_MOVE&&e.getY()-downY>100&&web.getScrollY()<=0){moved=true;}else if(e.getAction()==android.view.MotionEvent.ACTION_UP&&moved){web.reload();downY=0;moved=false;}return false;}});`:'';
   const runtimePerms=[]; if(permissions.camera)runtimePerms.push('android.permission.CAMERA'); if(permissions.microphone)runtimePerms.push('android.permission.RECORD_AUDIO'); if(permissions.location)runtimePerms.push('android.permission.ACCESS_FINE_LOCATION'); if(permissions.notifications)runtimePerms.push('android.permission.POST_NOTIFICATIONS');
   const permArray=runtimePerms.length?runtimePerms.map(x=>'\"'+x+'\"').join(',') : '';
-  const chrome=`new WebChromeClient(){@Override public void onPermissionRequest(final PermissionRequest r){runOnUiThread(new Runnable(){public void run(){if(${permissions.camera||permissions.microphone})r.grant(r.getResources());else r.deny();}});}@Override public void onGeolocationPermissionsShowPrompt(String o,GeolocationPermissions.Callback c){if(${permissions.location})c.invoke(o,true,false);else c.invoke(o,false,false);}}`;
+  const chrome=`new WebChromeClient(){@Override public void onPermissionRequest(final PermissionRequest r){runOnUiThread(new Runnable(){public void run(){java.util.ArrayList<String> g=new java.util.ArrayList<>();for(String x:r.getResources()){if(x.equals(PermissionRequest.RESOURCE_VIDEO_CAPTURE)&&${permissions.camera}&&checkSelfPermission("android.permission.CAMERA")==PackageManager.PERMISSION_GRANTED)g.add(x);else if(x.equals(PermissionRequest.RESOURCE_AUDIO_CAPTURE)&&${permissions.microphone}&&checkSelfPermission("android.permission.RECORD_AUDIO")==PackageManager.PERMISSION_GRANTED)g.add(x);}if(g.size()>0)r.grant(g.toArray(new String[0]));else r.deny();}});}@Override public void onGeolocationPermissionsShowPrompt(String o,GeolocationPermissions.Callback c){if(${permissions.location}&&checkSelfPermission("android.permission.ACCESS_FINE_LOCATION")==PackageManager.PERMISSION_GRANTED)c.invoke(o,true,false);else c.invoke(o,false,false);}}`;
   write(path.join(dir,'app/src/main/java',...pkg.split('.'),'MainActivity.java'),`package ${pkg};
 import android.app.Activity;import android.os.Bundle;import android.webkit.*;import android.view.*;import android.graphics.Color;import android.content.pm.PackageManager;
 public class MainActivity extends Activity{WebView web;${touch}${pull}
@@ -490,7 +490,7 @@ async function handleBuild(req,res){
 
 const server=http.createServer(async(req,res)=>{
   const u=new URL(req.url,"http://localhost");
-  if(req.method==="GET" && u.pathname==="/health") return send(res,200,JSON.stringify({ok:true,engine:"android-webview",version:"1.5.6",node:process.version,sdk:SDK,gradle:"Gradle + Android Gradle Plugin 8.11.1"}),"application/json");
+  if(req.method==="GET" && u.pathname==="/health") return send(res,200,JSON.stringify({ok:true,engine:"android-webview",version:"1.5.12",node:process.version,sdk:SDK,gradle:"Gradle + Android Gradle Plugin 8.11.1"}),"application/json");
   if(req.method==="GET" && u.pathname==="/_preview") return previewProxy(req,res);
   if(req.method==="GET" && (u.pathname==="/font/twin.ttf" || u.pathname==="/font/twin.tff")){
     const f=path.join(__dirname,"public/font/twin.ttf");
@@ -509,5 +509,5 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==="POST" && u.pathname==="/api/build") return handleBuild(req,res);
   send(res,404,"Not found");
 });
-if(require.main===module) server.listen(PORT,"0.0.0.0",()=>console.log("Web to APK server v1.5.6 listening on "+PORT));
+if(require.main===module) server.listen(PORT,"0.0.0.0",()=>console.log("Web to APK server v1.5.12 listening on "+PORT));
 module.exports={project,validateConfig,normalizeHtml,writeIcon,writeSplashVideo,versionCode,versionName,prepareOfflineBundle};
